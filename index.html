@@ -1,942 +1,694 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bohol Trip w D1s</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bohol Trip w D1s — June 2026</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    :root {
-      --ocean: #0e7490; --ocean-dark: #0c4a6e; --ocean-light: #e0f2fe; --ocean-mid: #38bdf8;
-      --sand: #fef3c7; --sand-dark: #d97706; --sand-mid: #fbbf24;
-      --jungle: #166534; --jungle-light: #dcfce7; --jungle-mid: #4ade80;
-      --coral: #be185d; --coral-light: #fce7f3;
-      --stone: #f8fafc; --ink: #0f172a; --ink-mid: #334155; --ink-light: #64748b;
-      --border: #e2e8f0; --white: #ffffff; --radius: 20px; --radius-sm: 12px;
-    }
-    body { font-family: 'DM Sans', sans-serif; background: var(--stone); color: var(--ink); line-height: 1.6; }
-    .container { width: min(1200px, 92%); margin: auto; }
-
-    /* HERO */
-    header { position: relative; background: var(--ocean-dark); overflow: hidden; padding: 90px 0 70px; }
-    header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 70% 100%, rgba(14,116,144,0.6) 0%, transparent 70%), radial-gradient(ellipse 50% 80% at 10% 50%, rgba(56,189,248,0.15) 0%, transparent 60%); pointer-events: none; }
-    .wave-bg { position: absolute; bottom: 0; left: 0; right: 0; height: 80px; overflow: hidden; }
-    .wave-bg svg { width: 100%; height: 100%; }
-    .hero { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 8px; }
-    .hero-eyebrow { font-size: 0.85rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ocean-mid); }
-    .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(3rem, 6vw, 5.5rem); font-weight: 800; line-height: 1.05; color: var(--white); }
-    .hero .sub { font-size: clamp(1.2rem, 2.5vw, 1.65rem); font-weight: 500; color: rgba(255,255,255,0.7); margin-bottom: 12px; }
-    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-top: 28px; }
-    .stat-card { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14); padding: 20px 22px; border-radius: var(--radius); backdrop-filter: blur(6px); }
-    .stat-card h3 { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: var(--white); margin-bottom: 4px; }
-    .stat-card p { font-size: 0.83rem; color: rgba(255,255,255,0.6); font-weight: 500; }
-
-    /* TABS */
-    .tabs-wrapper { background: var(--white); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(15,23,42,0.07); }
-    .tabs { display: flex; width: min(1200px, 92%); margin: auto; }
-    .tab-btn { padding: 18px 32px; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 600; color: var(--ink-light); background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: color 0.18s, border-color 0.18s; }
-    .tab-btn:hover { color: var(--ocean); }
-    .tab-btn.active { color: var(--ocean-dark); border-bottom-color: var(--ocean); }
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
-
-    /* SECTIONS */
-    section { padding: 64px 0; }
-    .section-title { margin-bottom: 32px; }
-    .section-title .eyebrow { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ocean); margin-bottom: 8px; }
-    .section-title h2 { font-family: 'Playfair Display', serif; font-size: 2.1rem; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
-    .section-title p { color: var(--ink-light); font-size: 0.95rem; }
-
-    /* TIMELINE */
-    .timeline { display: flex; flex-direction: column; gap: 40px; }
-    .timeline-day { display: grid; grid-template-columns: 110px 1fr; gap: 0 28px; }
-    .tl-date-col { display: flex; flex-direction: column; align-items: flex-end; padding-top: 4px; }
-    .tl-date-badge { display: inline-flex; flex-direction: column; align-items: center; padding: 10px 14px; border-radius: var(--radius-sm); font-weight: 700; text-align: center; min-width: 88px; }
-    .tl-date-badge .day-num { font-family: 'Playfair Display', serif; font-size: 2rem; line-height: 1; }
-    .tl-date-badge .day-label { font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 3px; font-weight: 700; }
-    .tl-date-badge.d1 { background: #e0f2fe; color: #0369a1; }
-    .tl-date-badge.d2 { background: #fef9c3; color: #92400e; }
-    .tl-date-badge.d3 { background: #dcfce7; color: #166534; }
-    .tl-date-badge.d4 { background: #ffe4e6; color: #9f1239; }
-    .tl-line { width: 2px; background: var(--border); flex: 1; margin-top: 8px; margin-right: 42px; min-height: 20px; }
-    .tl-content { display: flex; flex-direction: column; }
-    .tl-day-title { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 700; color: var(--ink); margin-bottom: 20px; padding-top: 6px; }
-    .tl-stops { display: flex; flex-direction: column; }
-    .tl-stop { display: flex; gap: 16px; align-items: flex-start; position: relative; }
-    .tl-stop::before { content: ''; position: absolute; left: 17px; top: 40px; bottom: -1px; width: 2px; background: #e2e8f0; }
-    .tl-stop:last-child::before { display: none; }
-    .stop-dot { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; border: 2px solid var(--white); box-shadow: 0 2px 8px rgba(15,23,42,0.1); margin-top: 6px; }
-    .stop-dot.blue { background: #dbeafe; }
-    .stop-dot.amber { background: #fef3c7; }
-    .stop-dot.green { background: #dcfce7; }
-    .stop-dot.pink { background: #fce7f3; }
-    .stop-dot.teal { background: #ccfbf1; }
-    .stop-dot.purple { background: #ede9fe; }
-    .stop-dot.gray { background: #f1f5f9; }
-    .stop-body { flex: 1; padding: 0 0 26px 0; }
-    .stop-time { font-size: 0.71rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-light); margin-bottom: 2px; }
-    .stop-name { font-size: 1rem; font-weight: 700; color: var(--ink); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .stop-desc { font-size: 0.88rem; color: var(--ink-light); line-height: 1.55; }
-    .stop-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
-    .tag { font-size: 0.7rem; font-weight: 700; padding: 3px 9px; border-radius: 999px; }
-    .tag-optional { background: #fef9c3; color: #92400e; }
-    .tag-free { background: #dcfce7; color: #166534; }
-    .tag-booked { background: #e0f2fe; color: #0369a1; }
-    .tag-key { background: #fce7f3; color: #be185d; }
-    .stop-note { margin-top: 8px; padding: 10px 14px; background: #f8fafc; border-left: 3px solid var(--ocean-mid); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; font-size: 0.83rem; color: var(--ink-mid); line-height: 1.5; }
-    .overnight-banner { margin-top: 10px; padding: 10px 16px; background: var(--ocean-dark); color: var(--white); border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
-
-    /* BUDGET TAB — DAY CARDS */
-    .days-stack { display: flex; flex-direction: column; gap: 22px; }
-    .day-card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; box-shadow: 0 4px 24px rgba(15,23,42,0.06); }
-    .day-card-header { display: flex; align-items: center; justify-content: space-between; padding: 22px 26px; gap: 16px; flex-wrap: wrap; border-bottom: 1px solid var(--border); background: linear-gradient(90deg, #f0f9ff 0%, var(--white) 60%); }
-    .day-label-group { display: flex; flex-direction: column; gap: 5px; }
-    .day-badge { display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; width: fit-content; }
-    .day-badge.d1 { background: #e0f2fe; color: #0369a1; }
-    .day-badge.d2 { background: #fef9c3; color: #92400e; }
-    .day-badge.d3 { background: #dcfce7; color: #166534; }
-    .day-badge.d4 { background: #ffe4e6; color: #9f1239; }
-    .day-title { font-size: 1.05rem; font-weight: 700; color: var(--ink); }
-    .day-total { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; color: var(--ocean-dark); white-space: nowrap; }
-    .itinerary-list { padding: 12px 16px; display: flex; flex-direction: column; gap: 6px; }
-    .itinerary-item { border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--border); }
-    .itinerary-row { display: flex; align-items: center; justify-content: space-between; padding: 13px 16px; cursor: pointer; gap: 10px; transition: background 0.15s; user-select: none; background: #f8fafc; }
-    .itinerary-row:hover { background: #eff6ff; }
-    .row-left { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 0.93rem; color: var(--ink); flex: 1; min-width: 0; }
-    .row-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
-    .icon-blue { background: #e0f2fe; color: #0369a1; }
-    .icon-amber { background: #fef3c7; color: #92400e; }
-    .icon-green { background: #dcfce7; color: #166534; }
-    .icon-pink { background: #fce7f3; color: #be185d; }
-    .icon-teal { background: #ccfbf1; color: #0f766e; }
-    .icon-purple { background: #ede9fe; color: #6d28d9; }
-    .icon-orange { background: #ffedd5; color: #c2410c; }
-    .row-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-    .item-price { font-weight: 700; color: var(--ocean-dark); font-size: 0.95rem; }
-    .chevron { width: 16px; height: 16px; color: #94a3b8; transition: transform 0.2s; flex-shrink: 0; }
-    .itinerary-item.open .chevron { transform: rotate(180deg); }
-    .itinerary-detail { display: none; padding: 14px 16px; background: var(--white); border-top: 1px solid var(--border); }
-    .itinerary-item.open .itinerary-detail { display: block; }
-    .detail-table { width: 100%; border-collapse: collapse; }
-    .detail-table tr { border-bottom: 1px solid #f1f5f9; }
-    .detail-table tr:last-child { border-bottom: none; }
-    .detail-table td { padding: 8px 0; font-size: 0.88rem; color: var(--ink-mid); }
-    .detail-table td:last-child { text-align: right; font-weight: 600; color: var(--ink); }
-    .detail-subtotal { margin-top: 10px; padding: 10px 14px; background: #eff6ff; border-radius: 10px; font-weight: 700; color: var(--ocean-dark); display: flex; justify-content: space-between; font-size: 0.88rem; }
-    .optional-label { font-size: 0.7rem; background: #fef9c3; color: #92400e; padding: 2px 8px; border-radius: 999px; font-weight: 700; flex-shrink: 0; }
-    .free-label { font-size: 0.7rem; background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 999px; font-weight: 700; flex-shrink: 0; }
-    .activity-table { width: 100%; border-collapse: collapse; margin-top: 6px; }
-    .activity-table th { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-light); padding: 6px 0 8px; text-align: left; border-bottom: 2px solid var(--border); }
-    .activity-table th:last-child { text-align: right; }
-    .activity-table td { padding: 7px 0; font-size: 0.88rem; color: var(--ink-mid); border-bottom: 1px solid #f1f5f9; }
-    .activity-table td:last-child { text-align: right; font-weight: 600; color: var(--ink); }
-
-    /* MAP */
-    #map { height: 560px; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); box-shadow: 0 4px 24px rgba(15,23,42,0.07); }
-
-    /* SUMMARY */
-    .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 22px; }
-    .card { background: var(--white); border-radius: var(--radius); padding: 28px; border: 1px solid var(--border); box-shadow: 0 4px 24px rgba(15,23,42,0.05); }
-    .card h3 { font-family: 'Playfair Display', serif; font-size: 1.35rem; font-weight: 700; margin-bottom: 20px; color: var(--ink); }
-    .budget-table { width: 100%; border-collapse: collapse; }
-    .budget-table tr { border-bottom: 1px solid var(--border); }
-    .budget-table td { padding: 11px 0; font-size: 0.94rem; color: var(--ink-mid); }
-    .budget-table td:last-child { text-align: right; font-weight: 700; color: var(--ink); }
-    .subtotal-row { margin-top: 16px; padding: 16px 18px; border-radius: var(--radius-sm); background: #f0f9ff; display: flex; justify-content: space-between; font-weight: 700; color: var(--ocean-dark); font-size: 1rem; }
-    .buffer-block { margin-top: 14px; padding: 16px 18px; border-radius: var(--radius-sm); }
-    .buffer-block h4 { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
-    .buffer-block table { width: 100%; border-collapse: collapse; }
-    .buffer-block table td { padding: 6px 0; font-size: 0.88rem; }
-    .buffer-block table td:last-child { text-align: right; font-weight: 600; }
-    .locked-row { margin-top: 14px; padding: 16px 20px; background: var(--ocean-dark); color: var(--white); border-radius: var(--radius-sm); display: flex; justify-content: space-between; font-weight: 700; font-size: 1.1rem; }
-    .drivers-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
-    .driver-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; background: #f8fafc; border-radius: var(--radius-sm); border: 1px solid var(--border); font-size: 0.9rem; }
-    .driver-left { display: flex; align-items: center; gap: 10px; font-weight: 600; color: var(--ink); }
-    .driver-note { font-size: 0.8rem; color: var(--ink-light); font-weight: 400; }
-    .driver-right { font-weight: 700; color: var(--ocean-dark); font-size: 0.92rem; }
-    .notes-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
-    .notes-list li { display: flex; gap: 10px; align-items: flex-start; font-size: 0.9rem; color: var(--ink-mid); line-height: 1.5; }
-    .notes-list li::before { content: '→'; color: var(--ocean); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
-
-    /* SOURCES */
-    .sources { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 16px; }
-    .source-link { background: var(--white); border-radius: var(--radius-sm); padding: 18px 20px; border: 1px solid var(--border); text-decoration: none; color: var(--ink); transition: border-color 0.2s, transform 0.2s; box-shadow: 0 2px 10px rgba(15,23,42,0.04); display: block; }
-    .source-link:hover { transform: translateY(-3px); border-color: var(--ocean); }
-    .source-link h4 { font-size: 0.94rem; font-weight: 600; margin-bottom: 6px; }
-    .source-link p { color: var(--ink-light); font-size: 0.83rem; }
-
-    /* FOOTER */
-    footer { background: var(--ink); color: #94a3b8; text-align: center; padding: 40px 20px; font-size: 0.88rem; }
-    footer span { color: var(--ocean-mid); font-weight: 600; }
-
-    @media (max-width: 768px) {
-      header { padding: 60px 0 50px; }
-      .card { padding: 22px; }
-      #map { height: 400px; }
-      .day-card-header { flex-direction: column; align-items: flex-start; }
-      .timeline-day { grid-template-columns: 88px 1fr; gap: 0 14px; }
-      .tl-line { margin-right: 32px; }
-      .tab-btn { padding: 14px 18px; font-size: 0.88rem; }
-    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;background:#f8fafc;color:#0f172a;line-height:1.6}
+    .container{width:min(1100px,92%);margin:auto}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+    input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+    input[type=number]{-moz-appearance:textfield}
+    :root{--ocean:#0e7490;--ocean-dark:#0c4a6e;--border:#e2e8f0;--stone:#f8fafc;--ink:#0f172a;--ink-mid:#334155;--ink-light:#64748b}
   </style>
 </head>
 <body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
 
-<!-- HERO -->
-<header>
-  <div class="wave-bg">
-    <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M0,40 C240,80 480,0 720,40 C960,80 1200,0 1440,40 L1440,80 L0,80 Z" fill="#f8fafc"/>
-    </svg>
-  </div>
-  <div class="container hero">
-    <div class="hero-eyebrow">Bohol, Philippines — June 5–8, 2026</div>
-    <h1>Bohol Trip w D1s</h1>
-    <div class="sub">4 Days · 7 Pax · ₱40k Budget</div>
-    <div class="stats">
-      <div class="stat-card"><h3>₱40k</h3><p>Total budget cap</p></div>
-      <div class="stat-card"><h3>7 Pax</h3><p>Group size</p></div>
-      <div class="stat-card"><h3>4 Days</h3><p>June 5–8, 2026</p></div>
-      <div class="stat-card"><h3>~₱38.8k</h3><p>Estimated total</p></div>
-      <div class="stat-card"><h3>~₱1,240</h3><p>Remaining buffer ✅</p></div>
+// ─── CONSTANTS ────────────────────────────────────────────────────────────────
+const PIN = "0626";
+const SK_STATUS = "bohol-stop-status";
+const SK_ACTUAL  = "bohol-actual-spend";
+
+const DAYS = [
+  {
+    id:"d1",label:"Day 1",date:"June 5",color:"#0369a1",bg:"#e0f2fe",
+    title:"Cebu → Tagbilaran → Panglao",
+    budgetTitle:"Cebu → Tagbilaran → Panglao (Airbnb check-in)",
+    stops:[
+      {id:"s1_1",emoji:"🚢",time:"10:40 AM",name:"Ferry Cebu → Tagbilaran",tag:"Key Departure",tagType:"key",desc:"Fast craft departs at 10:40AM, arrives Tagbilaran in roughly 2 hours.",note:"⚠️ Boat fares are personal — not part of the group budget. Be at the port with time to spare."},
+      {id:"s1_2",emoji:"⚓",time:"~1:00 PM",name:"Arrive — Tagbilaran Port",desc:"Disembark at Tagbilaran Port. From here, head over to Panglao — no rush, the afternoon is open."},
+      {id:"s1_3",emoji:"🍽️",time:"1:00 PM – 3:00 PM",name:"Lunch + Suroy-suroy Panglao",tag:"Chill Mode",tagType:"free",desc:"Lunch anywhere along the way, then suroy-suroy — beaches, side streets, random food spots. No fixed agenda, just get a feel for the place before settling in."},
+      {id:"s1_4",emoji:"🏡",time:"~3:00 PM",name:"Airbnb Check-in + Panglao Beach",tag:"Already Booked",tagType:"booked",desc:"Drop bags at the Airbnb, then head straight to the beach. Swim, sit, explore Alona Beach — the whole afternoon is free.",note:"📍 Confirm check-in time with the host. Suggested checkout on Day 2 is 11AM."},
+      {id:"s1_5",emoji:"🌙",time:"Evening",name:"Dinner + Free Time",tag:"Mostly Free",tagType:"free",desc:"Dinner near the Airbnb. First night in Bohol — whatever the group feels like.",overnight:"🌙 Overnight — Panglao Airbnb"},
+    ],
+    budget:[
+      {id:"b1_1",icon:"🏡",label:"Airbnb Check-in — Panglao",amount:4600,detail:[["Airbnb (Panglao Island)","~₱4,600"],["Status","Already booked ✓"]]},
+      {id:"b1_2",icon:"🏖️",label:"Panglao Beach / Chill",amount:0,free:true,detail:[["Beach swimming, Alona Beach stroll, sunset","Free"]]},
+      {id:"b1_3",icon:"🍽️",label:"Food (Day 1)",amount:3500,detail:[["Group meals (~₱500/head × 7)","~₱3,500"]]},
+      {id:"b1_4",icon:"🎉",label:"Miscellaneous (Day 1)",amount:1200,detail:[["Commute from port to Panglao","~incl."],["Suroy-suroy / entrance fees","~incl."],["Snacks, convenience store runs","~incl."]]},
+    ],
+    total:9300,
+  },
+  {
+    id:"d2",label:"Day 2",date:"June 6",color:"#92400e",bg:"#fef9c3",
+    title:"Brunch → Checkout → Rental → Danao → Loay",
+    budgetTitle:"Brunch → Checkout → Rental → Danao → Loay",
+    stops:[
+      {id:"s2_1",emoji:"🍳",time:"Morning",name:"Wake Up + Brunch",desc:"No alarm. Wake up naturally, have brunch near the Airbnb, and take it easy before checking out."},
+      {id:"s2_2",emoji:"🏡",time:"~11:00 AM",name:"Airbnb Checkout",tag:"Suggested 11AM",tagType:"key",desc:"Pack up and settle with the host. Aiming for 11AM gives enough buffer to pick up the rental and still reach Danao by early afternoon."},
+      {id:"s2_3",emoji:"🚗",time:"~11:00 AM – 12:00 NN",name:"Pick Up Car Rental + Drive to Danao",desc:"Pick up the rental, load the bags, and head north. Danao is roughly 2 to 2.5 hours from Panglao.",note:"🚗 Coordinate rental pickup time in advance. 2-day rental: June 6–7, returned on Day 4."},
+      {id:"s2_4",emoji:"🎢",time:"2:00 PM – 6:00 PM",name:"Danao Adventure Park",tag:"Main Activity",tagType:"key",desc:"The main event — The Plunge. Spend the afternoon at the park, explore the grounds after the jump. See budget tab for fees.",note:"💡 Confirm slot availability at the counter upon arrival. Go straight there first before anything else."},
+      {id:"s2_5",emoji:"🏘️",time:"6:00 PM onwards",name:"Drive South to Loay",tag:"Free Stay",tagType:"free",desc:"Head south to Loay after the park. Dinner somewhere along the drive — it's about 2 hours down. Early sleep; Day 3 starts at 3AM.",overnight:"🌙 Overnight — Loay (Friend's House) · Free"},
+    ],
+    budget:[
+      {id:"b2_1",icon:"🚗",label:"Car Rental — Day 1 of 2",amount:3000,detail:[["Self-drive car rental (Day 2, June 6)","~₱3,000"]],note:"2-day rental total ₱6,000. Day 1 of 2 billed here; Day 2 of 2 on Day 3."},
+      {id:"b2_2",icon:"🎢",label:"Danao Adventure Park",amount:6300,detail:[["Entrance fee (~₱50/head × 7)","~₱350"],["The Plunge — 7 pax × ₱850","₱5,950"]]},
+      {id:"b2_3",icon:"🍽️",label:"Food (Day 2)",amount:3500,detail:[["Group meals (~₱500/head × 7)","~₱3,500"]]},
+      {id:"b2_4",icon:"🏡",label:"Overnight Stay — Loay",amount:0,free:true,detail:[["Friend's house in Loay","₱0"]]},
+    ],
+    total:12800,
+  },
+  {
+    id:"d3",label:"Day 3",date:"June 7",color:"#166534",bg:"#dcfce7",
+    title:"Loay → Alicia → Anda → Cave/Falls → Loay",
+    budgetTitle:"Loay → Alicia → Anda → Cave/Falls (Optional) → Loay",
+    stops:[
+      {id:"s3_1",emoji:"🌙",time:"3:00 AM",name:"Departure from Loay",tag:"3AM Start",tagType:"key",desc:"Very early departure from Loay. Roughly 2 hours to Alicia — arriving just before dawn beats both the heat and the crowd.",note:"⏰ Sleep early the night before. Water, snacks, and hiking shoes should be ready to go."},
+      {id:"s3_2",emoji:"⛰️",time:"5:00 AM – 9:00 AM",name:"Hike — Alicia Panoramic Park",desc:"Arrive at 5AM and start the ascent. Sunrise from the summit is the reward — panoramic views of Bohol's hills and coastline. Budget around 4 hours for the full hike.",note:"🥾 Expect low visibility on the first stretch of the trail; careful footing is necessary due to slippery sections."},
+      {id:"s3_3",emoji:"🏖️",time:"10:00 AM – 4:00 PM",name:"Anda Beach",desc:"White sand, crystal water. Full beach day — lunch here, swim, nap, recharge after the hike. See budget tab for fees."},
+      {id:"s3_4",emoji:"🌊",time:"4:00 PM – 6:00 PM",name:"Cave / Falls near Anda",tag:"Optional",tagType:"optional",desc:"Quick stop at a cave pool or falls near Anda — Cabagnow Cave Pool is a good option. Skip this if the group is wiped out from the beach.",note:"📍 Confirm the exact spot the night before — there are a few options around Anda."},
+      {id:"s3_5",emoji:"🏘️",time:"6:00 PM onwards",name:"Return to Loay",tag:"Free Stay",tagType:"free",desc:"Drive back south to Loay. Dinner on the way. Pack up that night — last morning tomorrow.",overnight:"🌙 Overnight — Loay (Friend's House) · Free"},
+    ],
+    budget:[
+      {id:"b3_1",icon:"🚗",label:"Car Rental — Day 2 of 2",amount:3000,detail:[["Self-drive car rental (Day 3, June 7)","~₱3,000"]],note:"2nd and final day of rental. Returned on Day 4 in Tagbilaran."},
+      {id:"b3_2",icon:"⛰️",label:"Alicia Panoramic Park",amount:1300,detail:[["Entrance fee (~₱100/head × 7)","~₱700"],["Guide fee","~₱600"]]},
+      {id:"b3_3",icon:"🏖️",label:"Anda Beach",amount:510,detail:[["Entrance fee (~₱30/head × 7)","~₱210"],["Cottage rental","~₱300"]]},
+      {id:"b3_4",icon:"🌊",label:"Cave / Falls near Anda",amount:350,optional:true,detail:[["Entrance fee (~₱50/head × 7)","~₱350"]],note:"e.g. Cabagnow Cave Pool. Skip if tired or running late."},
+      {id:"b3_5",icon:"🍽️",label:"Food (Day 3)",amount:3500,detail:[["Group meals (~₱500/head × 7)","~₱3,500"]]},
+      {id:"b3_6",icon:"🏡",label:"Overnight Stay — Loay",amount:0,free:true,detail:[["Friend's house in Loay","₱0"]]},
+    ],
+    total:8660,
+  },
+  {
+    id:"d4",label:"Day 4",date:"June 8",color:"#9f1239",bg:"#ffe4e6",
+    title:"Return Rental → Tagbilaran → Go Home",
+    budgetTitle:"Return Rental → Tagbilaran → Go Home",
+    stops:[
+      {id:"s4_1",emoji:"🌄",time:"Morning",name:"Wake Up — Pack Up at Loay",desc:"Last morning in Bohol. Settle any remaining shared expenses, have breakfast, and say goodbye to the house."},
+      {id:"s4_2",emoji:"🚗",time:"~9:00 AM – 10:00 AM",name:"Return Car Rental",tag:"Return On Time",tagType:"key",desc:"Drive to Tagbilaran for the rental drop-off. Car wash before return if the agreement requires it.",note:"🚗 Confirm the return deadline with the rental provider ahead of time — needs to line up with the ferry schedule."},
+      {id:"s4_3",emoji:"🍽️",time:"~10:00 AM – 12:00 NN",name:"Last Meal in Tagbilaran",desc:"Last group meal near the port. One final sit-down before everyone heads home."},
+      {id:"s4_4",emoji:"🚢",time:"Afternoon",name:"Ferry Back to Cebu — Go Home 🎉",desc:"Ferry back to Cebu. Settle any remaining shared costs on the boat. Trip's a wrap.",note:"🎉 Boat fares are personal — not in the group budget. Coordinate ferry schedules ahead of the trip."},
+    ],
+    budget:[
+      {id:"b4_1",icon:"🍽️",label:"Food + Last Expenses",amount:2000,detail:[["Final group meal near port","~incl."],["Car rental return included in Day 2–3 cost","—"]]},
+    ],
+    total:2000,
+  },
+];
+
+const GAS_ITEM = {id:"gas",icon:"⛽",label:"Gas + Car Wash (Whole Trip)",amount:6000,detail:[["~372 km total · Toyota Avanza · ~14 km/L","~26.6 L"],["Fuel at ~₱90/L","~₱2,500"],["Car wash before return","~₱400"],["Buffer / contingency","~₱3,100"]]};
+const BUDGET_CAP = 40000;
+const GRAND_TOTAL = 38760;
+
+const MAP_LOCS = [
+  {name:"Tagbilaran Port",coords:[9.6568,123.8532],desc:"Day 1 — Arrive via 10:40AM ferry",day:1},
+  {name:"Panglao (Airbnb)",coords:[9.5781,123.7458],desc:"Day 1 — Check-in ~3PM",day:1},
+  {name:"Danao Adventure Park",coords:[9.9357,124.1862],desc:"Day 2 — The Plunge (2–6PM)",day:2},
+  {name:"Loay (Friend's House)",coords:[9.6007,124.014],desc:"Night 2 & 3 — Free stay",day:2},
+  {name:"Alicia Panoramic Park",coords:[9.8942,124.5374],desc:"Day 3 — Sunrise hike (5–9AM)",day:3},
+  {name:"Anda Beach",coords:[9.7434,124.5764],desc:"Day 3 — Beach day (10AM–4PM)",day:3},
+  {name:"Cave/Falls near Anda",coords:[9.76,124.55],desc:"Day 3 — Optional stop",day:3},
+];
+
+// ─── localStorage helpers ─────────────────────────────────────────────────────
+function lsGet(key){try{const v=localStorage.getItem(key);return v?JSON.parse(v):null;}catch{return null;}}
+function lsSet(key,val){try{localStorage.setItem(key,JSON.stringify(val));}catch{}}
+
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
+function fmt(n){return"₱"+Number(n).toLocaleString();}
+const TAG_STYLES={key:{bg:"#fce7f3",color:"#be185d"},free:{bg:"#dcfce7",color:"#166534"},booked:{bg:"#e0f2fe",color:"#0369a1"},optional:{bg:"#fef9c3",color:"#92400e"}};
+
+function Tag({type,label}){
+  const s=TAG_STYLES[type]||TAG_STYLES.free;
+  return <span style={{fontSize:"0.68rem",fontWeight:700,padding:"2px 9px",borderRadius:999,background:s.bg,color:s.color,flexShrink:0,whiteSpace:"nowrap"}}>{label}</span>;
+}
+
+// ─── PIN MODAL ────────────────────────────────────────────────────────────────
+function PinModal({onSuccess,onClose}){
+  const [val,setVal]=useState("");
+  const [err,setErr]=useState(false);
+  function check(){
+    if(val===PIN){onSuccess();onClose();}
+    else{setErr(true);setVal("");setTimeout(()=>setErr(false),1200);}
+  }
+  return(
+    <div style={{position:"fixed",inset:0,background:"rgba(15,23,42,0.75)",zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center",backdropFilter:"blur(4px)",padding:"20px"}}>
+      <div style={{background:"#fff",borderRadius:20,padding:"36px 28px",width:"100%",maxWidth:320,boxShadow:"0 24px 80px rgba(0,0,0,0.25)",textAlign:"center"}}>
+        <div style={{fontSize:"2rem",marginBottom:10}}>🔐</div>
+        <div style={{fontFamily:"'Playfair Display',serif",fontSize:"1.25rem",fontWeight:700,marginBottom:6}}>Admin Mode</div>
+        <div style={{fontSize:"0.84rem",color:"#64748b",marginBottom:22}}>Enter PIN to edit status & spending</div>
+        <input type="password" maxLength={4} value={val}
+          onChange={e=>setVal(e.target.value)}
+          onKeyDown={e=>e.key==="Enter"&&check()}
+          placeholder="····"
+          style={{width:"100%",textAlign:"center",fontSize:"1.8rem",letterSpacing:"0.5em",padding:"12px 0",border:`2px solid ${err?"#ef4444":"#e2e8f0"}`,borderRadius:12,outline:"none",marginBottom:14,fontFamily:"monospace",transition:"border-color 0.2s"}}
+          autoFocus/>
+        {err&&<div style={{color:"#ef4444",fontSize:"0.82rem",marginBottom:10}}>Incorrect PIN</div>}
+        <div style={{display:"flex",gap:10}}>
+          <button onClick={onClose} style={{flex:1,padding:"12px 0",borderRadius:10,border:"1px solid #e2e8f0",background:"#f8fafc",cursor:"pointer",fontWeight:600,fontSize:"0.9rem"}}>Cancel</button>
+          <button onClick={check} style={{flex:1,padding:"12px 0",borderRadius:10,border:"none",background:"#0c4a6e",color:"#fff",cursor:"pointer",fontWeight:700,fontSize:"0.9rem"}}>Enter</button>
+        </div>
+      </div>
     </div>
-  </div>
-</header>
+  );
+}
 
-<!-- TABS -->
-<div class="tabs-wrapper">
-  <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('itinerary', this)">
-      🗺️ Itinerary
-    </button>
-    <button class="tab-btn" onclick="switchTab('budget', this)">
-      💰 Budget Plan
-    </button>
-  </div>
-</div>
-
-<!-- ═══════════ TAB 1 — ITINERARY ═══════════ -->
-<div id="tab-itinerary" class="tab-panel active">
-<section>
-  <div class="container">
-    <div class="section-title">
-      <div class="eyebrow">Schedule</div>
-      <h2>Trip Itinerary</h2>
-      <p>Day-by-day plan with estimated times. All times approximate.</p>
+// ─── STOP STATUS ──────────────────────────────────────────────────────────────
+function StopStatus({stopId,status,isAdmin,onChange}){
+  const s=status[stopId]||"upcoming";
+  const colors={upcoming:{bg:"#f1f5f9",color:"#64748b",label:"Upcoming"},active:{bg:"#fef9c3",color:"#92400e",label:"🔴 Active"},done:{bg:"#dcfce7",color:"#166534",label:"✓ Done"}};
+  const c=colors[s];
+  if(!isAdmin){
+    if(s==="done") return <span style={{fontSize:"0.72rem",fontWeight:700,color:"#166534",background:"#dcfce7",padding:"2px 10px",borderRadius:999,marginTop:6,display:"inline-block"}}>✓ Done</span>;
+    if(s==="active") return <span style={{fontSize:"0.72rem",fontWeight:700,color:"#92400e",background:"#fef9c3",padding:"2px 10px",borderRadius:999,marginTop:6,display:"inline-block",animation:"pulse 2s infinite"}}>🔴 Active</span>;
+    return null;
+  }
+  return(
+    <div style={{display:"flex",gap:6,marginTop:10,flexWrap:"wrap"}}>
+      {["upcoming","active","done"].map(st=>(
+        <button key={st} onClick={()=>onChange(stopId,st)}
+          style={{padding:"5px 13px",borderRadius:999,border:`2px solid ${s===st?c.color:"#e2e8f0"}`,background:s===st?c.bg:"#fff",color:s===st?c.color:"#64748b",cursor:"pointer",fontSize:"0.74rem",fontWeight:700,transition:"all 0.15s"}}>
+          {colors[st].label}
+        </button>
+      ))}
     </div>
+  );
+}
 
-    <div class="timeline">
+// ─── ITINERARY TAB ────────────────────────────────────────────────────────────
+function ItineraryTab({status,setStatus,isAdmin}){
+  const [expandedStop,setExpandedStop]=useState(null);
+  const mapRef=useRef(null);
+  const mapInited=useRef(false);
 
-      <!-- DAY 1 — JUNE 5 -->
-      <div class="timeline-day">
-        <div class="tl-date-col">
-          <div class="tl-date-badge d1"><div class="day-num">5</div><div class="day-label">Jun · Day 1</div></div>
-          <div class="tl-line"></div>
-        </div>
-        <div class="tl-content">
-          <div class="tl-day-title">Cebu → Tagbilaran → Panglao</div>
-          <div class="tl-stops">
+  useEffect(()=>{
+    if(mapInited.current||!window.L||!document.getElementById("bohol-map"))return;
+    setTimeout(()=>{
+      if(mapInited.current)return;
+      try{
+        const map=L.map("bohol-map").setView([9.75,124.15],10);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap"}).addTo(map);
+        const dc={1:"#0369a1",2:"#92400e",3:"#166534",4:"#9f1239"};
+        const coords=[];
+        MAP_LOCS.forEach(loc=>{
+          const icon=L.divIcon({className:"",html:`<div style="width:13px;height:13px;background:${dc[loc.day]};border:2.5px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3)"></div>`,iconSize:[13,13],iconAnchor:[6,6]});
+          L.marker(loc.coords,{icon}).addTo(map).bindPopup(`<strong>${loc.name}</strong><br><span style="color:#64748b;font-size:0.82em">Day ${loc.day} — ${loc.desc}</span>`);
+          coords.push(loc.coords);
+        });
+        L.polyline(coords,{color:"#0e7490",weight:3,opacity:0.6,dashArray:"6 6"}).addTo(map);
+        mapInited.current=true;
+      }catch(e){}
+    },400);
+  },[]);
 
-            <div class="tl-stop">
-              <div class="stop-dot blue">🚢</div>
-              <div class="stop-body">
-                <div class="stop-time">9:00 AM</div>
-                <div class="stop-name">Take 9AM Ferry — Cebu → Tagbilaran <span class="tag tag-key">Key Departure</span></div>
-                <div class="stop-desc">Fast craft departs at 9AM, arrives Tagbilaran in roughly 2 hours.</div>
-                <div class="stop-note">⚠️ Boat fares are personal — not part of the group budget. Be at the port with time to spare.</div>
+  function handleStatus(stopId,st){
+    const next={...status,[stopId]:st};
+    setStatus(next);
+    lsSet(SK_STATUS,next);
+  }
+
+  const activeStop=Object.entries(status).find(([,v])=>v==="active")?.[0];
+
+  return(
+    <div>
+      <section style={{padding:"32px 0 48px"}}>
+        <div className="container">
+          <div style={{marginBottom:22}}>
+            <div style={{fontSize:"0.72rem",fontWeight:700,letterSpacing:"0.14em",textTransform:"uppercase",color:"#0e7490",marginBottom:6}}>Schedule</div>
+            <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:"clamp(1.6rem,5vw,2.2rem)",fontWeight:800,color:"#0f172a",marginBottom:4}}>Trip Itinerary</h2>
+            <p style={{color:"#64748b",fontSize:"0.87rem"}}>Tap any stop to expand. All times approximate.{isAdmin?" Admin mode on.":""}</p>
+          </div>
+
+          {activeStop&&(
+            <div style={{marginBottom:20,padding:"13px 16px",background:"linear-gradient(135deg,#fef9c3,#fef3c7)",border:"2px solid #fbbf24",borderRadius:14,display:"flex",alignItems:"center",gap:10}}>
+              <span style={{fontSize:"1.1rem"}}>📍</span>
+              <div>
+                <div style={{fontWeight:700,fontSize:"0.7rem",textTransform:"uppercase",letterSpacing:"0.08em",color:"#92400e"}}>Currently Active</div>
+                <div style={{fontWeight:700,color:"#0f172a",fontSize:"0.93rem"}}>{DAYS.flatMap(d=>d.stops).find(s=>s.id===activeStop)?.name||"—"}</div>
               </div>
             </div>
+          )}
 
-            <div class="tl-stop">
-              <div class="stop-dot blue">⚓</div>
-              <div class="stop-body">
-                <div class="stop-time">~11:00 AM</div>
-                <div class="stop-name">Arrive — Tagbilaran Port</div>
-                <div class="stop-desc">Disembark at Tagbilaran Port. From here, head over to Panglao — no rush, the afternoon is open.</div>
+          <div style={{display:"flex",flexDirection:"column",gap:36}}>
+            {DAYS.map(day=>(
+              <div key={day.id}>
+                {/* Day header */}
+                <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:16}}>
+                  <div style={{display:"inline-flex",flexDirection:"column",alignItems:"center",padding:"8px 14px",borderRadius:12,background:day.bg,color:day.color,fontWeight:700,textAlign:"center",flexShrink:0}}>
+                    <div style={{fontFamily:"'Playfair Display',serif",fontSize:"1.55rem",lineHeight:1}}>{day.date.split(" ")[1]}</div>
+                    <div style={{fontSize:"0.58rem",letterSpacing:"0.1em",textTransform:"uppercase",marginTop:2}}>Jun · {day.label}</div>
+                  </div>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontFamily:"'Playfair Display',serif",fontSize:"0.92rem",fontWeight:700,color:"#0f172a",lineHeight:1.35}}>{day.title}</div>
+                  </div>
+                </div>
+
+                {/* Stops */}
+                <div style={{display:"flex",flexDirection:"column"}}>
+                  {day.stops.map((stop,si)=>{
+                    const st=status[stop.id]||"upcoming";
+                    const isDone=st==="done";
+                    const isActive=st==="active";
+                    const isExpanded=expandedStop===stop.id;
+                    const isLast=si===day.stops.length-1;
+                    return(
+                      <div key={stop.id} style={{display:"flex",gap:0,alignItems:"stretch",opacity:isDone?0.58:1,transition:"opacity 0.3s"}}>
+                        {/* Left: dot + line */}
+                        <div style={{display:"flex",flexDirection:"column",alignItems:"center",width:40,flexShrink:0}}>
+                          <div style={{width:34,height:34,borderRadius:"50%",flexShrink:0,background:isActive?"#fef3c7":isDone?"#dcfce7":"#f1f5f9",border:`2px solid ${isActive?"#fbbf24":isDone?"#4ade80":"#e2e8f0"}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,marginTop:2,boxShadow:isActive?"0 0 0 4px rgba(251,191,36,0.18)":"none",transition:"all 0.3s",zIndex:1}}>
+                            {isDone?"✓":stop.emoji}
+                          </div>
+                          {!isLast&&<div style={{width:2,flex:1,background:"#e2e8f0",marginTop:3}}/>}
+                        </div>
+                        {/* Right: content */}
+                        <div style={{flex:1,paddingLeft:12,paddingBottom:isLast?4:22,minWidth:0,paddingTop:2}}>
+                          <div style={{fontSize:"0.66rem",fontWeight:700,letterSpacing:"0.09em",textTransform:"uppercase",color:"#94a3b8",marginBottom:2}}>{stop.time}</div>
+                          <div onClick={()=>setExpandedStop(isExpanded?null:stop.id)} style={{cursor:"pointer"}}>
+                            <div style={{fontWeight:700,fontSize:"0.93rem",color:"#0f172a",display:"flex",alignItems:"center",gap:6,flexWrap:"wrap",marginBottom:3,lineHeight:1.3}}>
+                              {isDone?<s style={{color:"#94a3b8"}}>{stop.name}</s>:stop.name}
+                              {isActive&&<span style={{fontSize:"0.64rem",fontWeight:700,background:"#fef9c3",color:"#92400e",padding:"2px 7px",borderRadius:999,flexShrink:0}}>🔴 Now</span>}
+                            </div>
+                            {stop.tag&&<div style={{marginBottom:4}}><Tag type={stop.tagType} label={stop.tag}/></div>}
+                            {!isExpanded&&(
+                              <div style={{fontSize:"0.83rem",color:"#94a3b8",marginTop:1}}>
+                                {stop.desc.length>70?stop.desc.slice(0,70)+"… tap to read":stop.desc}
+                              </div>
+                            )}
+                          </div>
+                          {isExpanded&&(
+                            <div style={{marginTop:6}}>
+                              <p style={{fontSize:"0.86rem",color:"#475569",lineHeight:1.6}}>{stop.desc}</p>
+                              {stop.note&&<div style={{marginTop:9,padding:"9px 12px",background:"#f8fafc",borderLeft:"3px solid #38bdf8",borderRadius:"0 10px 10px 0",fontSize:"0.8rem",color:"#334155",lineHeight:1.5}}>{stop.note}</div>}
+                              {stop.overnight&&<div style={{marginTop:10,padding:"9px 14px",background:"#0c4a6e",color:"#fff",borderRadius:10,fontSize:"0.82rem",fontWeight:600,display:"inline-flex",alignItems:"center",gap:7}}>{stop.overnight}</div>}
+                              <StopStatus stopId={stop.id} status={status} isAdmin={isAdmin} onChange={handleStatus}/>
+                              <button onClick={()=>setExpandedStop(null)} style={{marginTop:10,fontSize:"0.77rem",color:"#94a3b8",background:"none",border:"none",cursor:"pointer",padding:0,display:"block"}}>▲ Collapse</button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-
-            <div class="tl-stop">
-              <div class="stop-dot amber">🍽️</div>
-              <div class="stop-body">
-                <div class="stop-time">11:00 AM – 3:00 PM</div>
-                <div class="stop-name">Lunch + Suroy-suroy Panglao <span class="tag tag-free">Chill Mode</span></div>
-                <div class="stop-desc">Lunch anywhere along the way, then suroy-suroy — beaches, side streets, random food spots. No fixed agenda, just get a feel for the place before settling in.</div>
-              </div>
-            </div>
-
-            <div class="tl-stop">
-              <div class="stop-dot green">🏡</div>
-              <div class="stop-body">
-                <div class="stop-time">~3:00 PM</div>
-                <div class="stop-name">Airbnb Check-in + Panglao Beach <span class="tag tag-booked">Already Booked</span></div>
-                <div class="stop-desc">Drop bags at the Airbnb, then head straight to the beach. Swim, sit, explore Alona Beach — the whole afternoon is free.</div>
-                <div class="stop-note">📍 Confirm check-in time with the host. Suggested checkout on Day 2 is 11AM.</div>
-              </div>
-            </div>
-
-            <div class="tl-stop">
-              <div class="stop-dot teal">🌙</div>
-              <div class="stop-body">
-                <div class="stop-time">Evening</div>
-                <div class="stop-name">Dinner + Free Time <span class="tag tag-free">Mostly Free</span></div>
-                <div class="stop-desc">Dinner at Airbnb. First night in Bohol. Whatever the group feels like.</div>
-                <div class="overnight-banner">🌙 Overnight — Panglao Airbnb</div>
-              </div>
-            </div>
-
+            ))}
           </div>
         </div>
-      </div>
+      </section>
 
-      <!-- DAY 2 — JUNE 6 -->
-      <div class="timeline-day">
-        <div class="tl-date-col">
-          <div class="tl-date-badge d2"><div class="day-num">6</div><div class="day-label">Jun · Day 2</div></div>
-          <div class="tl-line"></div>
-        </div>
-        <div class="tl-content">
-          <div class="tl-day-title">Brunch → Checkout → Rental → Danao → Loay</div>
-          <div class="tl-stops">
-
-            <div class="tl-stop">
-              <div class="stop-dot amber">🍳</div>
-              <div class="stop-body">
-                <div class="stop-time">Morning</div>
-                <div class="stop-name">Wake Up + Brunch</div>
-                <div class="stop-desc">No alarm. Wake up naturally, have brunch near the Airbnb, and take it easy before checking out.</div>
-              </div>
-            </div>
-
-            <div class="tl-stop">
-              <div class="stop-dot amber">🏡</div>
-              <div class="stop-body">
-                <div class="stop-time">~11:00 AM</div>
-                <div class="stop-name">Airbnb Checkout <span class="tag tag-key">Suggested 11AM</span></div>
-                <div class="stop-desc">Pack up and settle with the host. Aiming for 11AM gives enough buffer to pick up the rental and still reach Danao by early afternoon.</div>
-              </div>
-            </div>
-
-            <div class="tl-stop">
-              <div class="stop-dot blue">🚗</div>
-              <div class="stop-body">
-                <div class="stop-time">~11:00 AM – 12:00 NN</div>
-                <div class="stop-name">Pick Up Car Rental + Drive to Danao</div>
-                <div class="stop-desc">Pick up the rental, load the bags, and head north. Danao is roughly 2 to 2.5 hours from Panglao.</div>
-                <div class="stop-note">🚗 Coordinate rental pickup time in advance. 2-day rental: June 6–7, returned on Day 4.</div>
-              </div>
-            </div>
-
-            <div class="tl-stop">
-              <div class="stop-dot pink">🎢</div>
-              <div class="stop-body">
-                <div class="stop-time">2:00 PM – 6:00 PM</div>
-                <div class="stop-name">Danao Adventure Park <span class="tag tag-key">Main Activity</span></div>
-                <div class="stop-desc">The main event — The Plunge. Spend the afternoon at the park, explore the grounds after the jump. See budget tab for fees.</div>
-                <div class="stop-note">💡 Confirm slot availability at the counter upon arrival. Go straight there first before anything else.</div>
-              </div>
-            </div>
-
-            <div class="tl-stop">
-              <div class="stop-dot teal">🏘️</div>
-              <div class="stop-body">
-                <div class="stop-time">6:00 PM onwards</div>
-                <div class="stop-name">Drive South to Loay <span class="tag tag-free">Free Stay</span></div>
-                <div class="stop-desc">Head south to Loay after the park. Dinner somewhere along the drive — it's about 2 hours down. Early sleep; Day 3 starts at 3AM.</div>
-                <div class="overnight-banner">🌙 Overnight — Loay (Friend's House) · Free</div>
-              </div>
-            </div>
-
+      {/* Map */}
+      <section style={{background:"#f0f9ff",padding:"40px 0 56px"}}>
+        <div className="container">
+          <div style={{marginBottom:18}}>
+            <div style={{fontSize:"0.72rem",fontWeight:700,letterSpacing:"0.14em",textTransform:"uppercase",color:"#0e7490",marginBottom:6}}>Navigation</div>
+            <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:"clamp(1.5rem,4vw,2rem)",fontWeight:800,color:"#0f172a"}}>Interactive Trip Map</h2>
+            <p style={{color:"#64748b",fontSize:"0.87rem",marginTop:4}}>All major destinations, color-coded by day.</p>
+          </div>
+          <div id="bohol-map" style={{height:380,borderRadius:16,overflow:"hidden",border:"1px solid #e2e8f0",boxShadow:"0 4px 20px rgba(15,23,42,0.07)"}}/>
+          <div style={{display:"flex",gap:14,marginTop:14,flexWrap:"wrap"}}>
+            {DAYS.map(d=><div key={d.id} style={{display:"flex",alignItems:"center",gap:5,fontSize:"0.78rem",fontWeight:600,color:d.color}}><span style={{width:9,height:9,borderRadius:"50%",background:d.color,display:"inline-block",flexShrink:0}}/>{d.label} · {d.date}</div>)}
           </div>
         </div>
-      </div>
-
-      <!-- DAY 3 — JUNE 7 -->
-      <div class="timeline-day">
-        <div class="tl-date-col">
-          <div class="tl-date-badge d3"><div class="day-num">7</div><div class="day-label">Jun · Day 3</div></div>
-          <div class="tl-line"></div>
-        </div>
-        <div class="tl-content">
-          <div class="tl-day-title">Loay → Alicia → Anda → Cave/Falls → Loay</div>
-          <div class="tl-stops">
-
-            <div class="tl-stop">
-              <div class="stop-dot green">🌙</div>
-              <div class="stop-body">
-                <div class="stop-time">3:00 AM</div>
-                <div class="stop-name">Departure from Loay <span class="tag tag-key">3AM Start</span></div>
-                <div class="stop-desc">Very early departure from Loay. Roughly 2 hours to Alicia — arriving just before dawn beats both the heat and the crowd.</div>
-                <div class="stop-note">⏰ Sleep early the night before. Water, snacks, and hiking shoes should be ready to go.</div>
-              </div>
-            </div>
-
-            <div class="tl-stop">
-              <div class="stop-dot green">⛰️</div>
-              <div class="stop-body">
-                <div class="stop-time">5:00 AM – 9:00 AM</div>
-                <div class="stop-name">Hike — Alicia Panoramic Park</div>
-                <div class="stop-desc">Arrive at 5AM and start the ascent. Sunrise from the summit is the reward — panoramic views of Bohol's hills and coastline. Budget around 4 hours for the full hike.</div>
-                <div class="stop-note">🥾 Expect low visibility on the first stretch of the trail; careful footing is necessary due to slippery sections.</div>
-              </div>
-            </div>
-
-            <div class="tl-stop">
-              <div class="stop-dot teal">🏖️</div>
-              <div class="stop-body">
-                <div class="stop-time">10:00 AM – 4:00 PM</div>
-                <div class="stop-name">Anda Beach</div>
-                <div class="stop-desc">White sand, crystal water. Full beach day — lunch here, swim, nap, recharge after the hike. See budget tab for fees.</div>
-              </div>
-            </div>
-
-            <div class="tl-stop">
-              <div class="stop-dot purple">🌊</div>
-              <div class="stop-body">
-                <div class="stop-time">4:00 PM – 6:00 PM</div>
-                <div class="stop-name">Cave / Falls near Anda <span class="tag tag-optional">Optional</span></div>
-                <div class="stop-desc">Quick stop at a cave pool or falls near Anda — Cabagnow Cave Pool is a good option. Skip this if the group is wiped out from the beach.</div>
-                <div class="stop-note">📍 Confirm the exact spot the night before — there are a few options around Anda.</div>
-              </div>
-            </div>
-
-            <div class="tl-stop">
-              <div class="stop-dot teal">🏘️</div>
-              <div class="stop-body">
-                <div class="stop-time">6:00 PM onwards</div>
-                <div class="stop-name">Return to Loay <span class="tag tag-free">Free Stay</span></div>
-                <div class="stop-desc">Drive back south to Loay. Dinner on the way. Pack up that night — last morning tomorrow.</div>
-                <div class="overnight-banner">🌙 Overnight — Loay (Friend's House) · Free</div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-      <!-- DAY 4 — JUNE 8 -->
-      <div class="timeline-day">
-        <div class="tl-date-col">
-          <div class="tl-date-badge d4"><div class="day-num">8</div><div class="day-label">Jun · Day 4</div></div>
-          <div class="tl-line"></div>
-        </div>
-        <div class="tl-content">
-          <div class="tl-day-title">Return Rental → Tagbilaran → Go Home</div>
-          <div class="tl-stops">
-
-            <div class="tl-stop">
-              <div class="stop-dot amber">🌄</div>
-              <div class="stop-body">
-                <div class="stop-time">Morning</div>
-                <div class="stop-name">Wake Up — Pack Up at Loay</div>
-                <div class="stop-desc">Last morning in Bohol. Settle any remaining shared expenses, have breakfast, and say goodbye to the house.</div>
-              </div>
-            </div>
-
-            <div class="tl-stop">
-              <div class="stop-dot blue">🚗</div>
-              <div class="stop-body">
-                <div class="stop-time">~9:00 AM – 10:00 AM</div>
-                <div class="stop-name">Return Car Rental <span class="tag tag-key">Return On Time</span></div>
-                <div class="stop-desc">Drive to Tagbilaran for the rental drop-off. Car wash before return if the agreement requires it.</div>
-                <div class="stop-note">🚗 Confirm the return deadline with the rental provider ahead of time — needs to line up with the ferry schedule.</div>
-              </div>
-            </div>
-
-            <div class="tl-stop">
-              <div class="stop-dot amber">🍽️</div>
-              <div class="stop-body">
-                <div class="stop-time">~10:00 AM – 12:00 NN</div>
-                <div class="stop-name">Last Meal in Tagbilaran</div>
-                <div class="stop-desc">Last group meal near the port. One final sit-down before everyone heads home.</div>
-              </div>
-            </div>
-
-            <div class="tl-stop">
-              <div class="stop-dot blue">🚢</div>
-              <div class="stop-body">
-                <div class="stop-time">Afternoon</div>
-                <div class="stop-name">Ferry Back to Cebu — Go Home 🎉</div>
-                <div class="stop-desc">Ferry back to Cebu. Settle any remaining shared costs on the boat. Trip's a wrap.</div>
-                <div class="stop-note">🎉 Boat fares are personal — not in the group budget. Coordinate ferry schedules ahead of the trip.</div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-    </div><!-- end .timeline -->
-  </div>
-</section>
-
-<!-- MAP -->
-<section style="background: #f0f9ff; padding: 64px 0;">
-  <div class="container">
-    <div class="section-title">
-      <div class="eyebrow">Navigation</div>
-      <h2>Interactive Trip Map</h2>
-      <p>All major destinations, color-coded by day.</p>
+      </section>
     </div>
-    <div id="map"></div>
-  </div>
-</section>
-</div><!-- end #tab-itinerary -->
+  );
+}
 
-<!-- ═══════════ TAB 2 — BUDGET ═══════════ -->
-<div id="tab-budget" class="tab-panel">
-<section>
-  <div class="container">
-    <div class="section-title">
-      <div class="eyebrow">Finances</div>
-      <h2>Budget Breakdown</h2>
-      <p>Tap any item for the detailed cost breakdown. Boat fares excluded. Car rental: self-drive, picked up Day 2.</p>
-    </div>
-
-    <div class="days-stack">
-
-      <!-- DAY 1 -->
-      <div class="day-card">
-        <div class="day-card-header">
-          <div class="day-label-group">
-            <span class="day-badge d1">Day 1 — June 5</span>
-            <span class="day-title">Cebu → Tagbilaran → Panglao (Airbnb check-in)</span>
-          </div>
-          <span class="day-total">~₱9,300</span>
+// ─── BUDGET ROW ───────────────────────────────────────────────────────────────
+function BudgetRow({item,isOpen,onToggle}){
+  return(
+    <div style={{borderRadius:12,overflow:"hidden",border:"1px solid #e2e8f0"}}>
+      <div onClick={onToggle} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 14px",cursor:"pointer",background:isOpen?"#eff6ff":"#f8fafc",transition:"background 0.15s",gap:10}}>
+        <div style={{display:"flex",alignItems:"center",gap:9,fontWeight:600,fontSize:"0.9rem",color:"#0f172a",flex:1,minWidth:0}}>
+          <span style={{width:30,height:30,borderRadius:8,background:"#e0f2fe",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,flexShrink:0}}>{item.icon}</span>
+          <span style={{minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.label}</span>
+          {item.optional&&<span style={{fontSize:"0.64rem",fontWeight:700,background:"#fef9c3",color:"#92400e",padding:"2px 7px",borderRadius:999,flexShrink:0}}>Optional</span>}
+          {item.free&&<span style={{fontSize:"0.64rem",fontWeight:700,background:"#dcfce7",color:"#166534",padding:"2px 7px",borderRadius:999,flexShrink:0}}>Free</span>}
         </div>
-        <div class="itinerary-list">
-
-          <div class="itinerary-item">
-            <div class="itinerary-row" onclick="toggleItem(this)">
-              <div class="row-left"><span class="row-icon icon-teal">&#127968;</span>Airbnb Check-in — Panglao</div>
-              <div class="row-right"><span class="item-price">₱4,600</span><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
-            </div>
-            <div class="itinerary-detail">
-              <table class="detail-table">
-                <tr><td>Airbnb (Panglao Island)</td><td>~₱4,600</td></tr>
-                <tr><td>Status</td><td>Already booked ✓</td></tr>
-              </table>
-              <div class="detail-subtotal"><span>Subtotal</span><span>₱4,600</span></div>
-            </div>
-          </div>
-
-          <div class="itinerary-item">
-            <div class="itinerary-row" onclick="toggleItem(this)">
-              <div class="row-left"><span class="row-icon icon-blue">&#127958;</span>Panglao Beach / Chill<span class="free-label">Mostly Free</span></div>
-              <div class="row-right"><span class="item-price">—</span><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
-            </div>
-            <div class="itinerary-detail">
-              <table class="detail-table">
-                <tr><td>Beach swimming, Alona Beach stroll, sunset</td><td>Free</td></tr>
-              </table>
-              <div class="detail-subtotal"><span>Subtotal</span><span>₱0</span></div>
-            </div>
-          </div>
-
-          <div class="itinerary-item">
-            <div class="itinerary-row" onclick="toggleItem(this)">
-              <div class="row-left"><span class="row-icon icon-amber">&#127859;</span>Food (Day 1)</div>
-              <div class="row-right"><span class="item-price">₱3,500</span><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
-            </div>
-            <div class="itinerary-detail">
-              <table class="detail-table">
-                <tr><td>Group meals (~₱500/head × 7)</td><td>~₱3,500</td></tr>
-              </table>
-              <div class="detail-subtotal"><span>Subtotal</span><span>₱3,500</span></div>
-            </div>
-          </div>
-
-          <div class="itinerary-item">
-            <div class="itinerary-row" onclick="toggleItem(this)">
-              <div class="row-left"><span class="row-icon icon-orange">&#127881;</span>Miscellaneous (Day 1)</div>
-              <div class="row-right"><span class="item-price">₱1,200</span><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
-            </div>
-            <div class="itinerary-detail">
-              <table class="detail-table">
-                <tr><td>Commute from port to Panglao</td><td>~incl.</td></tr>
-                <tr><td>Suroy-suroy / entrance fees</td><td>~incl.</td></tr>
-                <tr><td>Snacks, convenience store runs</td><td>~incl.</td></tr>
-              </table>
-              <div class="detail-subtotal"><span>Allocation</span><span>₱1,200</span></div>
-            </div>
-          </div>
-
+        <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
+          <span style={{fontWeight:700,color:"#0c4a6e",fontSize:"0.92rem"}}>{item.amount===0?"₱0":"~"+fmt(item.amount)}</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.5" style={{transform:isOpen?"rotate(180deg)":"none",transition:"transform 0.2s",flexShrink:0}}><path d="M6 9l6 6 6-6"/></svg>
         </div>
       </div>
-
-      <!-- DAY 2 -->
-      <div class="day-card">
-        <div class="day-card-header">
-          <div class="day-label-group">
-            <span class="day-badge d2">Day 2 — June 6</span>
-            <span class="day-title">Brunch → Checkout → Rental → Danao → Loay</span>
-          </div>
-          <span class="day-total">~₱12,800</span>
-        </div>
-        <div class="itinerary-list">
-
-          <div class="itinerary-item">
-            <div class="itinerary-row" onclick="toggleItem(this)">
-              <div class="row-left"><span class="row-icon icon-blue">&#128664;</span>Car Rental — Day 1 of 2</div>
-              <div class="row-right"><span class="item-price">₱3,000</span><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
-            </div>
-            <div class="itinerary-detail">
-              <table class="detail-table">
-                <tr><td>Self-drive car rental (Day 2, June 6)</td><td>~₱3,000</td></tr>
-              </table>
-              <p style="font-size:0.8rem; color:var(--ink-light); margin-top:8px;">Suggested checkout 11AM. 2-day rental total ₱6,000. Day 1 of 2 billed here; Day 2 of 2 on Day 3.</p>
-              <div class="detail-subtotal"><span>Subtotal</span><span>₱3,000</span></div>
-            </div>
-          </div>
-
-          <div class="itinerary-item">
-            <div class="itinerary-row" onclick="toggleItem(this)">
-              <div class="row-left"><span class="row-icon icon-pink">&#127906;</span>Danao Adventure Park</div>
-              <div class="row-right"><span class="item-price">₱6,300</span><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
-            </div>
-            <div class="itinerary-detail">
-              <table class="detail-table">
-                <tr><td>Entrance fee (~₱50/head × 7)</td><td>~₱350</td></tr>
-              </table>
-              <p style="font-size:0.83rem; color:var(--ink-light); margin: 10px 0 6px; font-weight:600;">Planned Activity</p>
-              <table class="activity-table">
-                <thead><tr><th>Activity</th><th>Pax</th><th>Rate</th><th>Total</th></tr></thead>
-                <tbody><tr><td>The Plunge</td><td>7 pax</td><td>₱850 each</td><td>₱5,950</td></tr></tbody>
-              </table>
-              <div class="detail-subtotal"><span>Subtotal (entrance + The Plunge)</span><span>₱6,300</span></div>
-            </div>
-          </div>
-
-          <div class="itinerary-item">
-            <div class="itinerary-row" onclick="toggleItem(this)">
-              <div class="row-left"><span class="row-icon icon-amber">&#127859;</span>Food (Day 2)</div>
-              <div class="row-right"><span class="item-price">₱3,500</span><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
-            </div>
-            <div class="itinerary-detail">
-              <table class="detail-table"><tr><td>Group meals (~₱500/head × 7)</td><td>~₱3,500</td></tr></table>
-              <div class="detail-subtotal"><span>Subtotal</span><span>₱3,500</span></div>
-            </div>
-          </div>
-
-          <div class="itinerary-item">
-            <div class="itinerary-row" onclick="toggleItem(this)">
-              <div class="row-left"><span class="row-icon icon-teal">&#127968;</span>Overnight Stay — Loay<span class="free-label">Free</span></div>
-              <div class="row-right"><span class="item-price">₱0</span><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
-            </div>
-            <div class="itinerary-detail">
-              <table class="detail-table"><tr><td>Friend's house in Loay</td><td>₱0</td></tr></table>
-              <div class="detail-subtotal"><span>Accommodation cost</span><span>₱0</span></div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- DAY 3 -->
-      <div class="day-card">
-        <div class="day-card-header">
-          <div class="day-label-group">
-            <span class="day-badge d3">Day 3 — June 7</span>
-            <span class="day-title">Loay → Alicia → Anda → Cave/Falls (Optional) → Loay</span>
-          </div>
-          <span class="day-total">~₱8,660</span>
-        </div>
-        <div class="itinerary-list">
-
-          <div class="itinerary-item">
-            <div class="itinerary-row" onclick="toggleItem(this)">
-              <div class="row-left"><span class="row-icon icon-blue">&#128664;</span>Car Rental — Day 2 of 2</div>
-              <div class="row-right"><span class="item-price">₱3,000</span><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
-            </div>
-            <div class="itinerary-detail">
-              <table class="detail-table">
-                <tr><td>Self-drive car rental (Day 3, June 7)</td><td>~₱3,000</td></tr>
-              </table>
-              <p style="font-size:0.8rem; color:var(--ink-light); margin-top:8px;">2nd and final day of rental. Returned on Day 4 in Tagbilaran.</p>
-              <div class="detail-subtotal"><span>Subtotal</span><span>₱3,000</span></div>
-            </div>
-          </div>
-
-          <div class="itinerary-item">
-            <div class="itinerary-row" onclick="toggleItem(this)">
-              <div class="row-left"><span class="row-icon icon-green">&#127956;</span>Alicia Panoramic Park</div>
-              <div class="row-right"><span class="item-price">₱1,300</span><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
-            </div>
-            <div class="itinerary-detail">
-              <table class="detail-table">
-                <tr><td>Entrance fee (~₱100/head × 7)</td><td>~₱700</td></tr>
-                <tr><td>Guide fee</td><td>~₱600</td></tr>
-              </table>
-              <div class="detail-subtotal"><span>Subtotal</span><span>₱1,300</span></div>
-            </div>
-          </div>
-
-          <div class="itinerary-item">
-            <div class="itinerary-row" onclick="toggleItem(this)">
-              <div class="row-left"><span class="row-icon icon-teal">&#127754;</span>Anda Beach</div>
-              <div class="row-right"><span class="item-price">₱510</span><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
-            </div>
-            <div class="itinerary-detail">
-              <table class="detail-table">
-                <tr><td>Entrance fee (~₱30/head × 7)</td><td>~₱210</td></tr>
-                <tr><td>Cottage rental</td><td>~₱300</td></tr>
-              </table>
-              <div class="detail-subtotal"><span>Subtotal</span><span>₱510</span></div>
-            </div>
-          </div>
-
-          <div class="itinerary-item">
-            <div class="itinerary-row" onclick="toggleItem(this)">
-              <div class="row-left"><span class="row-icon icon-purple">&#127811;</span>Cave / Falls near Anda<span class="optional-label">Optional</span></div>
-              <div class="row-right"><span class="item-price">~₱350</span><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
-            </div>
-            <div class="itinerary-detail">
-              <table class="detail-table"><tr><td>Entrance fee (~₱50/head × 7)</td><td>~₱350</td></tr></table>
-              <p style="font-size:0.8rem; color:var(--ink-light); margin-top:8px;">e.g. Cabagnow Cave Pool or a nearby falls. Skip if tired or running late.</p>
-              <div class="detail-subtotal"><span>Allocation (if visited)</span><span>~₱350</span></div>
-            </div>
-          </div>
-
-          <div class="itinerary-item">
-            <div class="itinerary-row" onclick="toggleItem(this)">
-              <div class="row-left"><span class="row-icon icon-amber">&#127859;</span>Food (Day 3)</div>
-              <div class="row-right"><span class="item-price">₱3,500</span><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
-            </div>
-            <div class="itinerary-detail">
-              <table class="detail-table"><tr><td>Group meals (~₱500/head × 7)</td><td>~₱3,500</td></tr></table>
-              <div class="detail-subtotal"><span>Subtotal</span><span>₱3,500</span></div>
-            </div>
-          </div>
-
-          <div class="itinerary-item">
-            <div class="itinerary-row" onclick="toggleItem(this)">
-              <div class="row-left"><span class="row-icon icon-teal">&#127968;</span>Overnight Stay — Loay<span class="free-label">Free</span></div>
-              <div class="row-right"><span class="item-price">₱0</span><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
-            </div>
-            <div class="itinerary-detail">
-              <table class="detail-table"><tr><td>Friend's house in Loay</td><td>₱0</td></tr></table>
-              <div class="detail-subtotal"><span>Accommodation cost</span><span>₱0</span></div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- DAY 4 -->
-      <div class="day-card">
-        <div class="day-card-header">
-          <div class="day-label-group">
-            <span class="day-badge d4">Day 4 — June 8</span>
-            <span class="day-title">Return Rental → Tagbilaran → Go Home</span>
-          </div>
-          <span class="day-total">~₱2,000</span>
-        </div>
-        <div class="itinerary-list">
-          <div class="itinerary-item">
-            <div class="itinerary-row" onclick="toggleItem(this)">
-              <div class="row-left"><span class="row-icon icon-amber">&#127859;</span>Food + Last Expenses (Departure Day)</div>
-              <div class="row-right"><span class="item-price">₱2,000</span><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
-            </div>
-            <div class="itinerary-detail">
-              <table class="detail-table">
-                <tr><td>Final group meal near port</td><td>~incl.</td></tr>
-                <tr><td>Car rental return included in Day 2 cost</td><td>—</td></tr>
-              </table>
-              <div class="detail-subtotal"><span>Subtotal</span><span>₱2,000</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- GAS + CAR WASH -->
-      <div class="day-card">
-        <div class="day-card-header">
-          <div class="day-label-group">
-            <span class="day-badge" style="background:#f3f4f6;color:#374151;">Whole Trip</span>
-            <span class="day-title">⛽ Gas Allocation + Car Wash</span>
-          </div>
-          <span class="day-total">~₱6,000</span>
-        </div>
-        <div class="itinerary-list">
-          <div class="itinerary-item">
-            <div class="itinerary-row" onclick="toggleItem(this)">
-              <div class="row-left"><span class="row-icon icon-blue">⛽</span>Fuel + Car Wash (Days 2–4)</div>
-              <div class="row-right"><span class="item-price">₱6,000</span><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
-            </div>
-            <div class="itinerary-detail">
-              <table class="detail-table">
-                <tr><td>Gas — long-distance driving (Danao, Anda, Tagbilaran)</td><td>~incl.</td></tr>
-                <tr><td>Car wash before vehicle return on Day 4</td><td>~incl.</td></tr>
-              </table>
-              <div class="detail-subtotal"><span>Total Allocation</span><span>₱6,000</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div><!-- end .days-stack -->
-  </div>
-</section>
-
-<!-- SUMMARY -->
-<section style="background: #f0f9ff; padding: 64px 0;">
-  <div class="container">
-    <div class="section-title">
-      <div class="eyebrow">Summary</div>
-      <h2>Budget Summary</h2>
-      <p>Final figures. Boat fares excluded as personal expense. Airbnb already confirmed.</p>
-    </div>
-
-    <div class="summary-grid">
-
-      <div class="card">
-        <h3>Grand Total</h3>
-        <table class="budget-table">
-          <tr><td>Day 1 — Cebu → Panglao (Airbnb check-in)</td><td>~₱9,300</td></tr>
-          <tr><td>Day 2 — Checkout → Rental → Danao → Loay</td><td>~₱12,800</td></tr>
-          <tr><td>Day 3 — Alicia → Anda → Cave/Falls → Loay</td><td>~₱8,660</td></tr>
-          <tr><td>Day 4 — Return rental → Go home</td><td>~₱2,000</td></tr>
-          <tr><td>Gas + Car Wash (Whole Trip)</td><td>~₱6,000</td></tr>
-        </table>
-        <div class="subtotal-row">
-          <span>Estimated Grand Total</span>
-          <span>~₱38,760</span>
-        </div>
-        <div class="buffer-block" style="background:#f0fdf4; border: 1px solid #bbf7d0;">
-          <h4 style="color:#166534;">~₱1,240 remaining buffer before ₱40k cap</h4>
-          <table>
-            <tr><td style="color:#166534;">Skip optional cave/falls to save</td><td style="color:#166534; text-align:right; font-weight:600;">~₱350</td></tr>
-            <tr><td style="color:#166534;">Food budget has flexibility</td><td style="color:#166534; text-align:right; font-weight:600;">adjustable</td></tr>
-            <tr><td style="color:#166534;">Monitor parking + fuel variance</td><td style="color:#166534; text-align:right; font-weight:600;">watch</td></tr>
+      {isOpen&&(
+        <div style={{padding:"12px 14px",background:"#fff",borderTop:"1px solid #e2e8f0"}}>
+          <table style={{width:"100%",borderCollapse:"collapse"}}>
+            {item.detail.map(([k,v],i)=>(
+              <tr key={i} style={{borderBottom:i<item.detail.length-1?"1px solid #f1f5f9":"none"}}>
+                <td style={{padding:"7px 0",fontSize:"0.84rem",color:"#334155"}}>{k}</td>
+                <td style={{padding:"7px 0",fontSize:"0.84rem",textAlign:"right",fontWeight:600,color:"#0f172a"}}>{v}</td>
+              </tr>
+            ))}
           </table>
-        </div>
-        <div class="locked-row">
-          <span>Budget cap</span>
-          <span>₱40,000</span>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3>Main Cost Drivers</h3>
-        <div class="drivers-grid">
-          <div class="driver-row">
-            <div class="driver-left">🍛 Food <span class="driver-note">4 days × ₱3,500 avg</span></div>
-            <div class="driver-right">~₱12,500</div>
-          </div>
-          <div class="driver-row">
-            <div class="driver-left">🚗 Car Rental (2 days) <span class="driver-note">Days 2 & 3, ₱3k each</span></div>
-            <div class="driver-right">~₱6,000</div>
-          </div>
-          <div class="driver-row">
-            <div class="driver-left">⛽ Gas + Car Wash <span class="driver-note">Long-distance driving</span></div>
-            <div class="driver-right">~₱6,000</div>
-          </div>
-          <div class="driver-row">
-            <div class="driver-left">🎢 Danao — The Plunge <span class="driver-note">7 pax × ₱850</span></div>
-            <div class="driver-right">~₱6,300</div>
-          </div>
-          <div class="driver-row">
-            <div class="driver-left">🏡 Airbnb Panglao <span class="driver-note">Already booked ✓</span></div>
-            <div class="driver-right">~₱4,600</div>
+          {item.note&&<p style={{fontSize:"0.78rem",color:"#64748b",marginTop:8}}>{item.note}</p>}
+          <div style={{marginTop:10,padding:"9px 13px",background:"#eff6ff",borderRadius:10,fontWeight:700,color:"#0c4a6e",display:"flex",justifyContent:"space-between",fontSize:"0.85rem"}}>
+            <span>Allocation</span><span>{item.amount===0?"₱0":"~"+fmt(item.amount)}</span>
           </div>
         </div>
+      )}
+    </div>
+  );
+}
+
+// ─── BUDGET PLAN TAB ──────────────────────────────────────────────────────────
+function BudgetPlanTab(){
+  const [open,setOpen]=useState({});
+  const toggle=id=>setOpen(p=>({...p,[id]:!p[id]}));
+  const buffer=BUDGET_CAP-GRAND_TOTAL;
+
+  return(
+    <section style={{padding:"32px 0 56px"}}>
+      <div className="container">
+        <div style={{marginBottom:24}}>
+          <div style={{fontSize:"0.72rem",fontWeight:700,letterSpacing:"0.14em",textTransform:"uppercase",color:"#0e7490",marginBottom:6}}>Finances</div>
+          <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:"clamp(1.6rem,5vw,2.2rem)",fontWeight:800,color:"#0f172a",marginBottom:4}}>Budget Breakdown</h2>
+          <p style={{color:"#64748b",fontSize:"0.87rem"}}>Tap any item for cost details. Boat fares excluded. Car rental: self-drive, picked up Day 2.</p>
+        </div>
+
+        <div style={{display:"flex",flexDirection:"column",gap:18}}>
+          {DAYS.map(day=>(
+            <div key={day.id} style={{background:"#fff",borderRadius:18,border:"1px solid #e2e8f0",overflow:"hidden",boxShadow:"0 3px 16px rgba(15,23,42,0.05)"}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"18px 20px",borderBottom:"1px solid #e2e8f0",background:"linear-gradient(90deg,#f0f9ff,#fff 60%)",flexWrap:"wrap",gap:10}}>
+                <div style={{display:"flex",flexDirection:"column",gap:4,minWidth:0}}>
+                  <span style={{display:"inline-block",padding:"3px 11px",borderRadius:999,fontSize:"0.68rem",fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",background:day.bg,color:day.color,width:"fit-content"}}>{day.label} — {day.date}</span>
+                  <span style={{fontSize:"0.92rem",fontWeight:700,color:"#0f172a",lineHeight:1.3}}>{day.budgetTitle}</span>
+                </div>
+                <span style={{fontFamily:"'Playfair Display',serif",fontSize:"1.35rem",fontWeight:700,color:"#0c4a6e",whiteSpace:"nowrap"}}>~{fmt(day.total)}</span>
+              </div>
+              <div style={{padding:"10px 12px",display:"flex",flexDirection:"column",gap:6}}>
+                {day.budget.map(item=><BudgetRow key={item.id} item={item} isOpen={open[item.id]} onToggle={()=>toggle(item.id)}/>)}
+              </div>
+            </div>
+          ))}
+
+          {/* Gas card */}
+          <div style={{background:"#fff",borderRadius:18,border:"1px solid #e2e8f0",overflow:"hidden",boxShadow:"0 3px 16px rgba(15,23,42,0.05)"}}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"18px 20px",borderBottom:"1px solid #e2e8f0",background:"linear-gradient(90deg,#f8fafc,#fff 60%)",flexWrap:"wrap",gap:10}}>
+              <div style={{display:"flex",flexDirection:"column",gap:4}}>
+                <span style={{display:"inline-block",padding:"3px 11px",borderRadius:999,fontSize:"0.68rem",fontWeight:700,background:"#f3f4f6",color:"#374151",width:"fit-content"}}>Whole Trip</span>
+                <span style={{fontSize:"0.92rem",fontWeight:700,color:"#0f172a"}}>⛽ Gas Allocation + Car Wash</span>
+              </div>
+              <span style={{fontFamily:"'Playfair Display',serif",fontSize:"1.35rem",fontWeight:700,color:"#0c4a6e"}}>~{fmt(GAS_ITEM.amount)}</span>
+            </div>
+            <div style={{padding:"10px 12px"}}><BudgetRow item={GAS_ITEM} isOpen={open[GAS_ITEM.id]} onToggle={()=>toggle(GAS_ITEM.id)}/></div>
+          </div>
+        </div>
+
+        {/* Summary */}
+        <div style={{marginTop:40}}>
+          <div style={{fontSize:"0.72rem",fontWeight:700,letterSpacing:"0.14em",textTransform:"uppercase",color:"#0e7490",marginBottom:6}}>Summary</div>
+          <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:"clamp(1.5rem,4vw,2rem)",fontWeight:800,color:"#0f172a",marginBottom:20}}>Budget Summary</h2>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:16}}>
+
+            {/* Grand total card */}
+            <div style={{background:"#fff",borderRadius:18,padding:22,border:"1px solid #e2e8f0",boxShadow:"0 3px 16px rgba(15,23,42,0.04)"}}>
+              <h3 style={{fontFamily:"'Playfair Display',serif",fontSize:"1.2rem",fontWeight:700,marginBottom:16,color:"#0f172a"}}>Grand Total</h3>
+              <table style={{width:"100%",borderCollapse:"collapse"}}>
+                {[...DAYS.map(d=>[d.label+" — "+d.date,d.total]),["Gas + Car Wash",GAS_ITEM.amount]].map(([k,v],i)=>(
+                  <tr key={i} style={{borderBottom:"1px solid #e2e8f0"}}>
+                    <td style={{padding:"9px 0",fontSize:"0.86rem",color:"#334155"}}>{k}</td>
+                    <td style={{padding:"9px 0",fontSize:"0.86rem",textAlign:"right",fontWeight:700,color:"#0f172a"}}>~{fmt(v)}</td>
+                  </tr>
+                ))}
+              </table>
+              <div style={{marginTop:12,padding:"13px 16px",borderRadius:12,background:"#f0f9ff",display:"flex",justifyContent:"space-between",fontWeight:700,color:"#0c4a6e",fontSize:"0.95rem"}}>
+                <span>Estimated Total</span><span>~{fmt(GRAND_TOTAL)}</span>
+              </div>
+              <div style={{marginTop:10,padding:"13px 16px",borderRadius:12,background:"#f0fdf4",border:"1px solid #bbf7d0"}}>
+                <div style={{fontSize:"0.76rem",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",color:"#166534",marginBottom:6}}>~{fmt(buffer)} remaining buffer ✅</div>
+                <div style={{fontSize:"0.82rem",color:"#166534"}}>Skipping optional cave/falls saves another ~₱350</div>
+              </div>
+              <div style={{marginTop:10,padding:"13px 16px",background:"#0c4a6e",color:"#fff",borderRadius:12,display:"flex",justifyContent:"space-between",fontWeight:700,fontSize:"1rem"}}>
+                <span>Budget Cap</span><span>{fmt(BUDGET_CAP)}</span>
+              </div>
+            </div>
+
+            {/* Cost drivers */}
+            <div style={{background:"#fff",borderRadius:18,padding:22,border:"1px solid #e2e8f0",boxShadow:"0 3px 16px rgba(15,23,42,0.04)"}}>
+              <h3 style={{fontFamily:"'Playfair Display',serif",fontSize:"1.2rem",fontWeight:700,marginBottom:16,color:"#0f172a"}}>Main Cost Drivers</h3>
+              <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                {[
+                  {icon:"🍛",label:"Food",note:"4 days × ~₱3,500",amt:"~₱12,500"},
+                  {icon:"🎢",label:"Danao — The Plunge",note:"7 pax × ₱850",amt:"~₱6,300"},
+                  {icon:"🚗",label:"Car Rental (2 days)",note:"₱3,000/day",amt:"~₱6,000"},
+                  {icon:"⛽",label:"Gas + Car Wash",note:"~372 km, ₱90/L + buffer",amt:"~₱6,000"},
+                  {icon:"🏡",label:"Airbnb Panglao",note:"Already booked ✓",amt:"~₱4,600"},
+                ].map((d,i)=>(
+                  <div key={i} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 12px",background:"#f8fafc",borderRadius:10,border:"1px solid #e2e8f0",gap:8}}>
+                    <div style={{display:"flex",alignItems:"center",gap:7,fontWeight:600,fontSize:"0.86rem",color:"#0f172a",minWidth:0}}>
+                      <span style={{flexShrink:0}}>{d.icon}</span>
+                      <span style={{overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{d.label}</span>
+                      <span style={{fontSize:"0.74rem",color:"#64748b",fontWeight:400,flexShrink:0,display:"none"}} className="driver-note">{d.note}</span>
+                    </div>
+                    <span style={{fontWeight:700,color:"#0c4a6e",fontSize:"0.88rem",flexShrink:0}}>{d.amt}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Notes */}
+            <div style={{background:"#fff",borderRadius:18,padding:22,border:"1px solid #e2e8f0",boxShadow:"0 3px 16px rgba(15,23,42,0.04)"}}>
+              <h3 style={{fontFamily:"'Playfair Display',serif",fontSize:"1.2rem",fontWeight:700,marginBottom:16,color:"#0f172a"}}>Important Notes</h3>
+              <ul style={{listStyle:"none",display:"flex",flexDirection:"column",gap:9}}>
+                {[
+                  "All prices are estimates (~). Actual costs may vary.",
+                  "Boat fare (Cebu ↔ Tagbilaran) excluded — personal per person.",
+                  "Airbnb Panglao confirmed at ~₱4,600. Check-in Day 1, checkout 11AM Day 2.",
+                  "Car rental: 2 days (June 6–7) at ₱3,000/day. Returned Day 4 in Tagbilaran.",
+                  "Danao: The Plunge only at ₱850/head × 7 = ₱5,950. Confirm all 7 are going.",
+                  "Cave/Falls near Anda is optional — skip to save ~₱350.",
+                  "Friend's house in Loay covers Nights 2 & 3 for free.",
+                  "Gas estimate: Toyota Avanza ~14 km/L, ~372 km total, ₱90/L + buffer.",
+                ].map((n,i)=>(
+                  <li key={i} style={{display:"flex",gap:9,alignItems:"flex-start",fontSize:"0.86rem",color:"#334155",lineHeight:1.5}}>
+                    <span style={{color:"#0e7490",fontWeight:700,flexShrink:0,marginTop:1}}>→</span>{n}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
+    </section>
+  );
+}
 
-      <div class="card">
-        <h3>Important Notes</h3>
-        <ul class="notes-list">
-          <li>All prices are estimates only (~). Actual costs may vary.</li>
-          <li>Boat fare (Cebu ↔ Tagbilaran) excluded — personal expense per person.</li>
-          <li>Airbnb (Panglao) confirmed at ~₱4,600 total. Check-in Day 1, checkout before 12NN Day 2.</li>
-          <li>Car rental: 2 days (June 6 & 7) at ₱3,000/day = ₱6,000. Returned on Day 4 in Tagbilaran.</li>
-          <li>Danao: The Plunge only at ₱850/head × 7 = ₱5,950. Confirm all 7 are going.</li>
-          <li>Cave / Falls near Anda is optional — skip to save ~₱350.</li>
-          <li>Friend's house in Loay covers Nights 2 and 3 for free — huge budget save.</li>
-          <li>Current estimate ~₱38,760 — ₱1,240 buffer before the ₱40k cap. Skipping optional cave/falls adds extra room.</li>
-        </ul>
-      </div>
+// ─── BUDGET TRACKER TAB ───────────────────────────────────────────────────────
+function BudgetTrackerTab({actual,setActual,isAdmin}){
+  const allItems=[
+    ...DAYS.flatMap(d=>d.budget.map(b=>({...b,dayLabel:d.label,dayDate:d.date,dayColor:d.color,dayBg:d.bg}))),
+    {...GAS_ITEM,dayLabel:"All Days",dayDate:"",dayColor:"#374151",dayBg:"#f3f4f6"},
+  ];
 
-    </div>
-  </div>
-</section>
-
-<!-- SOURCES -->
-<section style="padding: 64px 0;">
-  <div class="container">
-    <div class="section-title">
-      <div class="eyebrow">References</div>
-      <h2>Sources</h2>
-      <p>Tourist spot info, entrance rates, and travel references.</p>
-    </div>
-    <div class="sources">
-      <a class="source-link" target="_blank" href="https://geopark.bohol.gov.ph/en/the-alicia-panoramic-park/"><h4>Alicia Panoramic Park</h4><p>geopark.bohol.gov.ph</p></a>
-      <a class="source-link" target="_blank" href="https://www.reddit.com/r/PHikingAndBackpacking/comments/1qe2045/the_alicia_panoramic_park_tapp/"><h4>Alicia Entrance Fee Discussion</h4><p>reddit.com</p></a>
-      <a class="source-link" target="_blank" href="https://www.danaoadventurepark.com/"><h4>Danao Adventure Park</h4><p>danaoadventurepark.com</p></a>
-      <a class="source-link" target="_blank" href="https://www.airbnb.com/s/Panglao--Bohol--Philippines/homes"><h4>Panglao Airbnb Listings</h4><p>airbnb.com</p></a>
-      <a class="source-link" target="_blank" href="https://bohol.gov.ph/tourism/"><h4>Bohol Tourism</h4><p>bohol.gov.ph</p></a>
-    </div>
-  </div>
-</section>
-</div><!-- end #tab-budget -->
-
-<footer>
-  <p><span>Bohol Trip w D1s</span> &mdash; June 2026</p>
-</footer>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-  function switchTab(name, btn) {
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('tab-' + name).classList.add('active');
-    btn.classList.add('active');
+  function updateActual(id,val){
+    const n={...actual,[id]:val===""?"":Number(val)};
+    setActual(n);
+    lsSet(SK_ACTUAL,n);
   }
 
-  function toggleItem(row) {
-    row.closest('.itinerary-item').classList.toggle('open');
-  }
+  const totalBudgeted=allItems.reduce((s,i)=>s+i.amount,0);
+  const totalActual=allItems.reduce((s,i)=>{const v=actual[i.id];return s+(v!==""&&v!==undefined?Number(v):0);},0);
+  const totalEntered=allItems.filter(i=>actual[i.id]!==""&&actual[i.id]!==undefined).length;
+  const remaining=BUDGET_CAP-totalActual;
+  const overBudget=totalActual>BUDGET_CAP;
+  const pct=Math.min((totalActual/BUDGET_CAP)*100,100);
 
-  // Map init
-  document.addEventListener('DOMContentLoaded', function() {
-    const map = L.map('map').setView([9.75, 124.15], 10);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
+  const groups=[
+    ...DAYS.map(d=>({day:d,items:allItems.filter(i=>i.dayLabel===d.label)})),
+    {day:{label:"All Days",date:"",color:"#374151",bg:"#f3f4f6"},items:allItems.filter(i=>i.dayLabel==="All Days")},
+  ];
 
-    const locations = [
-      { name: 'Tagbilaran Port', coords: [9.6568, 123.8532], desc: 'Day 1 — Arrive via 9AM ferry, commute to Panglao', day: 1 },
-      { name: 'Panglao (Airbnb)', coords: [9.5781, 123.7458], desc: 'Day 1 — Check-in; checkout before 12NN on Day 2', day: 1 },
-      { name: 'Danao Adventure Park', coords: [9.9357, 124.1862], desc: 'Day 2 — The Plunge (₱850 × 7 pax)', day: 2 },
-      { name: "Loay (Friend's House)", coords: [9.6007, 124.0140], desc: 'Day 2 & 3 — Free overnight stays', day: 2 },
-      { name: 'Alicia Panoramic Park', coords: [9.8942, 124.5374], desc: 'Day 3 — Hike (₱100 entrance + ₱600 guide)', day: 3 },
-      { name: 'Anda Beach', coords: [9.7434, 124.5764], desc: 'Day 3 — Beach (₱30 entrance + cottage)', day: 3 },
-      { name: 'Cave/Falls near Anda (Optional)', coords: [9.7600, 124.5500], desc: 'Day 3 — Optional stop (~₱350)', day: 3 }
-    ];
+  return(
+    <section style={{padding:"32px 0 56px"}}>
+      <div className="container">
+        <div style={{marginBottom:22}}>
+          <div style={{fontSize:"0.72rem",fontWeight:700,letterSpacing:"0.14em",textTransform:"uppercase",color:"#0e7490",marginBottom:6}}>Live Tracking</div>
+          <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:"clamp(1.6rem,5vw,2.2rem)",fontWeight:800,color:"#0f172a",marginBottom:4}}>Budget Tracker</h2>
+          <p style={{color:"#64748b",fontSize:"0.87rem"}}>{isAdmin?"Admin mode — tap any amount to edit.":"Read-only. Tap 🔐 Admin (top right) to log spending."}</p>
+        </div>
 
-    const dayColors = { 1: '#0369a1', 2: '#92400e', 3: '#166534', 4: '#9f1239' };
-    const dayLabels = { 1: 'Day 1', 2: 'Day 2', 3: 'Day 3' };
-    const routeCoords = [];
+        {/* Summary cards */}
+        <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:10,marginBottom:24}}>
+          {[
+            {label:"Budgeted",val:fmt(totalBudgeted),sub:"total planned",color:"#0c4a6e",bg:"#e0f2fe"},
+            {label:"Spent",val:fmt(totalActual),sub:`${totalEntered}/${allItems.length} logged`,color:overBudget?"#9f1239":"#166534",bg:overBudget?"#ffe4e6":"#dcfce7"},
+            {label:overBudget?"Over Budget":"Remaining",val:fmt(Math.abs(remaining)),sub:"vs ₱40k cap",color:overBudget?"#9f1239":"#166534",bg:overBudget?"#ffe4e6":"#f0fdf4"},
+            {label:"Budget Cap",val:"₱40,000",sub:"group total",color:"#374151",bg:"#f3f4f6"},
+          ].map((s,i)=>(
+            <div key={i} style={{background:s.bg,borderRadius:14,padding:"14px 16px"}}>
+              <div style={{fontSize:"0.66rem",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.1em",color:s.color,opacity:0.7,marginBottom:5}}>{s.label}</div>
+              <div style={{fontFamily:"'Playfair Display',serif",fontSize:"1.4rem",fontWeight:700,color:s.color,lineHeight:1}}>{s.val}</div>
+              <div style={{fontSize:"0.72rem",color:s.color,opacity:0.65,marginTop:3}}>{s.sub}</div>
+            </div>
+          ))}
+        </div>
 
-    locations.forEach(loc => {
-      const color = dayColors[loc.day] || '#0369a1';
-      const icon = L.divIcon({
-        className: '',
-        html: `<div style="width:14px;height:14px;background:${color};border:2px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>`,
-        iconSize: [14,14], iconAnchor: [7,7]
-      });
-      L.marker(loc.coords, { icon }).addTo(map)
-        .bindPopup(`<strong>${loc.name}</strong><br><span style="color:#64748b;font-size:0.85em">${dayLabels[loc.day] || ''} — ${loc.desc}</span>`);
-      routeCoords.push(loc.coords);
-    });
+        {/* Progress bar */}
+        <div style={{marginBottom:28}}>
+          <div style={{display:"flex",justifyContent:"space-between",fontSize:"0.78rem",fontWeight:600,color:"#64748b",marginBottom:6}}>
+            <span>Spent: {fmt(totalActual)}</span><span>Cap: {fmt(BUDGET_CAP)}</span>
+          </div>
+          <div style={{height:10,background:"#e2e8f0",borderRadius:999,overflow:"hidden"}}>
+            <div style={{height:"100%",width:`${pct}%`,background:overBudget?"#ef4444":pct>85?"#f59e0b":"#22c55e",borderRadius:999,transition:"width 0.4s ease"}}/>
+          </div>
+          <div style={{fontSize:"0.74rem",color:"#94a3b8",marginTop:5,textAlign:"right"}}>{Math.round(pct)}% of budget used</div>
+        </div>
 
-    L.polyline(routeCoords, { color: '#0e7490', weight: 3, opacity: 0.7, dashArray: '6 6' }).addTo(map);
-  });
+        {/* Groups */}
+        {groups.map(({day,items})=>{
+          const groupBudget=items.reduce((s,i)=>s+i.amount,0);
+          const groupActual=items.reduce((s,i)=>{const v=actual[i.id];return s+(v!==""&&v!==undefined?Number(v):0);},0);
+          const diff=groupActual-groupBudget;
+          return(
+            <div key={day.label} style={{marginBottom:16,background:"#fff",borderRadius:18,border:"1px solid #e2e8f0",overflow:"hidden",boxShadow:"0 3px 16px rgba(15,23,42,0.04)"}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 16px",background:"linear-gradient(90deg,#f8fafc,#fff)",borderBottom:"1px solid #e2e8f0",flexWrap:"wrap",gap:8}}>
+                <span style={{padding:"3px 11px",borderRadius:999,fontSize:"0.68rem",fontWeight:700,background:day.bg,color:day.color,flexShrink:0}}>{day.label}{day.date?` — ${day.date}`:""}</span>
+                <div style={{display:"flex",gap:10,fontSize:"0.82rem",flexWrap:"wrap"}}>
+                  <span style={{color:"#64748b"}}>Budget: <strong style={{color:"#0c4a6e"}}>{fmt(groupBudget)}</strong></span>
+                  <span style={{color:"#64748b"}}>Actual: <strong style={{color:groupActual>groupBudget?"#9f1239":"#166534"}}>{fmt(groupActual)}</strong></span>
+                  {diff!==0&&<span style={{color:diff>0?"#9f1239":"#166534",fontWeight:700}}>{diff>0?"+":""}{fmt(diff)}</span>}
+                </div>
+              </div>
+              <div style={{padding:"8px 12px",display:"flex",flexDirection:"column",gap:6}}>
+                {items.map(item=>{
+                  const v=actual[item.id];
+                  const hasVal=v!==""&&v!==undefined;
+                  const over=hasVal&&Number(v)>item.amount;
+                  const under=hasVal&&Number(v)<item.amount;
+                  return(
+                    <div key={item.id} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:"#f8fafc",borderRadius:10,border:"1px solid #e2e8f0",flexWrap:"wrap"}}>
+                      <span style={{fontSize:15,flexShrink:0}}>{item.icon}</span>
+                      <div style={{flex:1,minWidth:100}}>
+                        <div style={{fontWeight:600,fontSize:"0.87rem",color:"#0f172a",lineHeight:1.3}}>{item.label}</div>
+                        <div style={{fontSize:"0.73rem",color:"#94a3b8"}}>Budget: {item.amount===0?"₱0 (free)":"~"+fmt(item.amount)}</div>
+                      </div>
+                      <div style={{display:"flex",alignItems:"center",gap:7,flexShrink:0}}>
+                        {isAdmin?(
+                          <div style={{position:"relative"}}>
+                            <span style={{position:"absolute",left:9,top:"50%",transform:"translateY(-50%)",color:"#64748b",fontWeight:600,fontSize:"0.88rem",pointerEvents:"none"}}>₱</span>
+                            <input type="number" min={0} value={v??""} onChange={e=>updateActual(item.id,e.target.value)} placeholder="0"
+                              style={{width:110,paddingLeft:22,paddingRight:8,paddingTop:7,paddingBottom:7,borderRadius:9,border:`2px solid ${over?"#fca5a5":under?"#86efac":"#e2e8f0"}`,fontSize:"0.88rem",fontWeight:600,outline:"none",background:"#fff",color:"#0f172a"}}/>
+                          </div>
+                        ):(
+                          <div style={{padding:"7px 12px",borderRadius:9,border:"2px solid #e2e8f0",fontSize:"0.88rem",fontWeight:600,color:hasVal?"#0f172a":"#94a3b8",background:"#fff",minWidth:90,textAlign:"right"}}>
+                            {hasVal?fmt(Number(v)):"—"}
+                          </div>
+                        )}
+                        {hasVal&&(
+                          <span style={{fontSize:"0.72rem",fontWeight:700,padding:"3px 8px",borderRadius:999,background:over?"#ffe4e6":"#dcfce7",color:over?"#9f1239":"#166534",whiteSpace:"nowrap"}}>
+                            {over?`+${fmt(Number(v)-item.amount)}`:under?`-${fmt(item.amount-Number(v))}`:"✓"}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+
+        {!isAdmin&&(
+          <div style={{textAlign:"center",marginTop:16,padding:"16px",background:"#f8fafc",borderRadius:14,border:"1px solid #e2e8f0",color:"#64748b",fontSize:"0.86rem"}}>
+            🔐 Tap Admin (top right) to log actual spending
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+// ─── APP ──────────────────────────────────────────────────────────────────────
+function App(){
+  const [tab,setTab]=useState("itinerary");
+  const [status,setStatus]=useState(()=>lsGet(SK_STATUS)||{});
+  const [actual,setActual]=useState(()=>lsGet(SK_ACTUAL)||{});
+  const [isAdmin,setIsAdmin]=useState(false);
+  const [showPin,setShowPin]=useState(false);
+
+  const doneCount=Object.values(status).filter(v=>v==="done").length;
+  const totalStops=DAYS.reduce((s,d)=>s+d.stops.length,0);
+
+  return(
+    <div style={{fontFamily:"'DM Sans',sans-serif",background:"#f8fafc",color:"#0f172a",lineHeight:1.6,minHeight:"100vh"}}>
+      {showPin&&<PinModal onSuccess={()=>setIsAdmin(true)} onClose={()=>setShowPin(false)}/>}
+
+      {/* HERO */}
+      <header style={{position:"relative",background:"#0c4a6e",overflow:"hidden",padding:"64px 0 50px"}}>
+        <div style={{position:"absolute",inset:0,background:"radial-gradient(ellipse 80% 60% at 70% 100%,rgba(14,116,144,0.6),transparent 70%),radial-gradient(ellipse 50% 80% at 10% 50%,rgba(56,189,248,0.15),transparent 60%)",pointerEvents:"none"}}/>
+        <div style={{position:"absolute",bottom:0,left:0,right:0,height:60,overflow:"hidden"}}>
+          <svg viewBox="0 0 1440 60" preserveAspectRatio="none" style={{width:"100%",height:"100%"}}>
+            <path d="M0,30 C240,60 480,0 720,30 C960,60 1200,0 1440,30 L1440,60 L0,60 Z" fill="#f8fafc"/>
+          </svg>
+        </div>
+        <div className="container" style={{position:"relative",zIndex:1}}>
+          <div style={{fontSize:"0.78rem",fontWeight:600,letterSpacing:"0.14em",textTransform:"uppercase",color:"#38bdf8",marginBottom:8}}>Bohol, Philippines — June 5–8, 2026</div>
+          <h1 style={{fontFamily:"'Playfair Display',serif",fontSize:"clamp(2.4rem,8vw,4.5rem)",fontWeight:800,lineHeight:1.05,color:"#fff",marginBottom:8}}>Bohol Trip w D1s</h1>
+          <div style={{fontSize:"clamp(1rem,3vw,1.4rem)",fontWeight:500,color:"rgba(255,255,255,0.7)",marginBottom:24}}>4 Days · 7 Pax · ₱40k Budget</div>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:10}}>
+            {[
+              {h:"₱40k",p:"Budget cap"},
+              {h:"7 Pax",p:"Group size"},
+              {h:"4 Days",p:"June 5–8"},
+              {h:"~₱38.8k",p:"Estimated total"},
+              {h:`${doneCount}/${totalStops}`,p:"Stops done"},
+            ].map((s,i)=>(
+              <div key={i} style={{background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.14)",padding:"15px 16px",borderRadius:16,backdropFilter:"blur(6px)"}}>
+                <div style={{fontFamily:"'Playfair Display',serif",fontSize:"1.6rem",fontWeight:700,color:"#fff",marginBottom:3}}>{s.h}</div>
+                <div style={{fontSize:"0.76rem",color:"rgba(255,255,255,0.6)",fontWeight:500}}>{s.p}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </header>
+
+      {/* STICKY TABS */}
+      <div style={{background:"#fff",borderBottom:"1px solid #e2e8f0",position:"sticky",top:0,zIndex:100,boxShadow:"0 2px 12px rgba(15,23,42,0.07)"}}>
+        <div className="container" style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+          <div style={{display:"flex",overflowX:"auto",WebkitOverflowScrolling:"touch"}}>
+            {[
+              {id:"itinerary",label:"🗺️ Itinerary"},
+              {id:"budget",label:"💰 Budget"},
+              {id:"tracker",label:"📊 Tracker"},
+            ].map(t=>(
+              <button key={t.id} onClick={()=>setTab(t.id)}
+                style={{padding:"14px 16px",fontFamily:"'DM Sans',sans-serif",fontSize:"0.88rem",fontWeight:600,color:tab===t.id?"#0c4a6e":"#64748b",background:"none",border:"none",borderBottom:`3px solid ${tab===t.id?"#0e7490":"transparent"}`,cursor:"pointer",transition:"color 0.18s,border-color 0.18s",whiteSpace:"nowrap",flexShrink:0}}>
+                {t.label}
+              </button>
+            ))}
+          </div>
+          <button onClick={()=>isAdmin?setIsAdmin(false):setShowPin(true)}
+            style={{padding:"7px 13px",borderRadius:9,border:`2px solid ${isAdmin?"#166534":"#e2e8f0"}`,background:isAdmin?"#dcfce7":"#f8fafc",color:isAdmin?"#166534":"#64748b",cursor:"pointer",fontWeight:700,fontSize:"0.78rem",display:"flex",alignItems:"center",gap:5,transition:"all 0.2s",flexShrink:0,marginLeft:4,marginRight:2}}>
+            {isAdmin?"🔓 Admin":"🔐 Admin"}
+          </button>
+        </div>
+      </div>
+
+      {/* PANELS */}
+      {tab==="itinerary"&&<ItineraryTab status={status} setStatus={setStatus} isAdmin={isAdmin}/>}
+      {tab==="budget"&&<BudgetPlanTab/>}
+      {tab==="tracker"&&<BudgetTrackerTab actual={actual} setActual={setActual} isAdmin={isAdmin}/>}
+
+      <footer style={{background:"#0f172a",color:"#94a3b8",textAlign:"center",padding:"28px 20px",fontSize:"0.84rem"}}>
+        <span style={{color:"#38bdf8",fontWeight:600}}>Bohol Trip w D1s</span> — June 2026
+      </footer>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
-
 </body>
 </html>
